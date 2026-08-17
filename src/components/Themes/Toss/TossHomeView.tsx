@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Plus, MapPin, Calendar, Sparkles, TrendingUp, Image as ImageIcon, ArrowUpRight, Compass, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Plus, MapPin, Calendar, Sparkles, TrendingUp, Image as ImageIcon, ArrowUpRight, Compass, ShieldCheck, QrCode } from 'lucide-react';
 import { Trip, PhotoItem, VisitedDistrictSummary, DistrictFeatureProperties, CountryCode } from '../../../types/travel';
 import { MapViewer } from '../../Map/MapViewer';
 import { JapanMapViewer } from '../../Map/JapanMapViewer';
@@ -157,9 +157,30 @@ export const TossHomeView: React.FC<TossHomeViewProps> = ({
                       flexShrink: 0,
                     }}
                   />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {trip.title}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {trip.title}
+                      </span>
+                      {trip.itinerary && trip.itinerary.some(i => i.qrCodeData || i.qrImageUrl) && (
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            color: isJapan ? '#f43f5e' : '#3182f6',
+                            background: isJapan ? 'rgba(244, 63, 94, 0.12)' : 'rgba(49, 130, 246, 0.12)',
+                            padding: '1px 6px',
+                            borderRadius: '6px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '2px',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <QrCode size={10} />
+                          <span>QR</span>
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                       {trip.startDate} • {trip.districtNames?.join(', ') || '지역'}

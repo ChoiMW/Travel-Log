@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Upload, Calendar, MapPin, Sparkles, Trash2, Check, Star, Tag, Clock, HelpCircle, ChevronDown, Globe } from 'lucide-react';
+import { X, Upload, Calendar, MapPin, Sparkles, Trash2, Check, Star, Tag, Clock, HelpCircle, ChevronDown, Globe, Plus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Trip, DistrictFeatureProperties, CountryCode } from '../../types/travel';
 import { sdoList, getDistrictsBySdo, getDistrictByCode } from '../../utils/geoMatcher';
@@ -55,8 +55,8 @@ export const TripEditorModal: React.FC<TripEditorModalProps> = ({
   const [selectedSigCode, setSelectedSigCode] = useState<string>('');
 
   // 일본 지역 선택 상태
-  const [selectedJapanRegion, setSelectedJapanRegion] = useState<string>('간토 지방');
-  const [selectedJapanPrefCode, setSelectedJapanPrefCode] = useState<string>('JP-13');
+  const [selectedJapanRegion, setSelectedJapanRegion] = useState<string>('규슈 지방');
+  const [selectedJapanPrefCode, setSelectedJapanPrefCode] = useState<string>('JP-40');
 
   // 업로드된 사진 목록 & 개별 관리
   const [uploadedPhotos, setUploadedPhotos] = useState<ParsedPhotoResult[]>([]);
@@ -118,85 +118,112 @@ export const TripEditorModal: React.FC<TripEditorModalProps> = ({
       setColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)]);
       setMemo('');
       setRating(5);
-      setTags([]);
+      setTags(['힐링']);
       setUploadedPhotos([]);
       setExifSuggestion(null);
 
       if (initialDistrict) {
         setSelectedDistricts([initialDistrict]);
-        if (initialDistrict.country === 'JP') {
-          setSelectedJapanRegion(initialDistrict.sdoName || '간토 지방');
-        } else {
-          setSelectedSdo(initialDistrict.sdoName);
-        }
         setTitle(`${initialDistrict.fullName} 여행`);
       } else {
         setSelectedDistricts([]);
       }
     }
-  }, [editingTrip, initialDistrict, isOpen]);
+  }, [editingTrip, initialDistrict, defaultCountry, isOpen]);
 
+  // 국가 변경 시 기본 세팅
+  const handleCountryChange = (newCountry: CountryCode) => {
+    setCountry(newCountry);
+    if (!editingTrip && selectedDistricts.length === 0) {
+      if (newCountry === 'JP') {
+        setSelectedJapanRegion('규슈 지방');
+        setSelectedJapanPrefCode('JP-40');
+      } else {
+        setSelectedSdo('서울특별시');
+        setSelectedSigCode('');
+      }
+    }
+  };
+
+  // 한국 시도 변경 시 시군구 목록
   const currentSdoDistricts = getDistrictsBySdo(selectedSdo);
-  const currentJapanPrefectures = japanPrefectures.filter(p => selectedJapanRegion === '전체 (47개 도도부현)' || p.regionName === selectedJapanRegion);
 
+  // 일본 지방 변경 시 도도부현 목록
+  const currentJapanPrefectures = japanPrefectures.filter(p => p.regionName === selectedJapanRegion);
+
+  // 한국 지역 추가
   const handleAddDistrict = (district: DistrictFeatureProperties) => {
     if (!selectedDistricts.some(d => d.code === district.code)) {
-      setSelectedDistricts(prev => [...prev, district]);
+      const updated = [...selectedDistricts, district];
+      setSelectedDistricts(updated);
       if (!title) {
         setTitle(`${district.fullName} 여행`);
       }
     }
   };
 
+  // 일본 도도부현 추가
   const handleAddJapanPrefecture = (prefCode: string) => {
     const pref = japanPrefectures.find(p => p.code === prefCode);
-    if (pref && !selectedDistricts.some(d => d.code === pref.code)) {
-      const distProp: DistrictFeatureProperties = {
-        code: pref.code,
-        name: pref.name,
-        fullName: pref.fullName,
-        sdoName: pref.regionName,
-        path: pref.path,
-        country: 'JP',
-      };
-      setSelectedDistricts(prev => [...prev, distProp]);
+    if (!pref) return;
+
+    const districtItem: DistrictFeatureProperties = {
+      code: pref.code,
+      name: pref.name,
+      fullName: pref.fullName,
+      sdoName: pref.regionName,
+      path: pref.path,
+      country: 'JP',
+    };
+
+    if (!selectedDistricts.some(d => d.code === districtItem.code)) {
+      const updated = [...selectedDistricts, districtItem];
+      setSelectedDistricts(updated);
       if (!title) {
         setTitle(`${pref.fullName} 여행`);
       }
     }
   };
 
+  // 지역 삭제
   const handleRemoveDistrict = (code: string) => {
     setSelectedDistricts(prev => prev.filter(d => d.code !== code));
   };
 
-  // 사진 파일 선택 및 EXIF 파싱
+  // 사진 업로드 및 EXIF 분석
   const handleFilesSelected = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     setIsAnalyzingPhotos(true);
-    const parsedList: ParsedPhotoResult[] = [];
+    try {
+      const newParsedPhotos: ParsedPhotoResult[] = [];
+      const fileArray = Array.from(files);
 
-    for (let i = 0; i < files.length; i++) {
-      try {
-        const parsed = await parsePhotoFile(files[i]);
-        parsedList.push(parsed);
-      } catch (err) {
-        console.warn('Failed to parse file:', files[i].name, err);
+      for (const file of fileArray) {
+        try {
+          const parsed = await parsePhotoFile(file);
+          newParsedPhotos.push(parsed);
+        } catch (err) {
+          console.warn('Photo parse error', err);
+        }
       }
-    }
 
-    setUploadedPhotos(prev => [...prev, ...parsedList]);
-    setIsAnalyzingPhotos(false);
+      setUploadedPhotos(prev => [...prev, ...newParsedPhotos]);
 
-    // 분석 제안 생성
-    const suggestion = analyzePhotosForTrip(parsedList);
-    if (suggestion.suggestedDistricts.length > 0 || parsedList.some(p => p.takenAt)) {
-      setExifSuggestion({
-        startDate: suggestion.suggestedStartDate,
-        endDate: suggestion.suggestedEndDate,
-        districts: suggestion.suggestedDistricts,
-      });
+      // EXIF 기반 날짜 및 지역 추천
+      const analysis = analyzePhotosForTrip([...uploadedPhotos, ...newParsedPhotos]);
+      if (analysis.suggestedStartDate && analysis.suggestedEndDate) {
+        setExifSuggestion({
+          startDate: analysis.suggestedStartDate,
+          endDate: analysis.suggestedEndDate,
+          districts: analysis.suggestedDistricts,
+        });
+      }
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+    } finally {
+      setIsAnalyzingPhotos(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -287,375 +314,544 @@ export const TripEditorModal: React.FC<TripEditorModalProps> = ({
 
   if (!isOpen) return null;
 
+  const isJapan = country === 'JP';
+  const brandColor = isJapan ? '#f43f5e' : '#3182f6';
+
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content" style={{ maxWidth: '640px' }}>
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '1.2rem' }}>{country === 'JP' ? '🗾' : '🗺️'}</span>
-            <h3>{editingTrip ? '여행 기록 수정' : '새 여행 기록하기'}</h3>
+    <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 100 }}>
+      <div
+        className="modal-content"
+        onClick={e => e.stopPropagation()}
+        style={{
+          maxWidth: '680px',
+          maxHeight: '92vh',
+          borderRadius: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        {/* 모달 헤더 */}
+        <div className="modal-header" style={{ padding: '24px 30px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '14px',
+                background: isJapan ? 'rgba(244, 63, 94, 0.12)' : 'rgba(49, 130, 246, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.3rem',
+              }}
+            >
+              {isJapan ? '🗾' : '🗺️'}
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', margin: 0 }}>
+                {editingTrip ? '여행 기록 수정' : '새 여행 기록하기'}
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+                지도에 방문한 지역을 채우고 소중한 추억을 기록해보세요
+              </p>
+            </div>
           </div>
-          <button className="btn-icon" onClick={onClose}>
+          <button className="btn-icon" onClick={onClose} title="닫기">
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="trip-form">
-          {/* 1. 여행 국가 선택 스위처 */}
-          <div className="form-group">
-            <label className="form-label" style={{ fontWeight: 800 }}>여행 국가</label>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                type="button"
-                onClick={() => setCountry('KR')}
+        {/* 모달 본문 폼 */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1 }}>
+          <div className="modal-body" style={{ padding: '26px 30px 32px', gap: '26px' }}>
+            
+            {/* 1. 여행 국가 선택 스위처 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>여행 국가</span>
+                <span className="form-label-desc">기록할 여행의 국가를 선택하세요</span>
+              </label>
+              <div
                 style={{
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '14px',
-                  border: country === 'KR' ? '2px solid #3182f6' : '1px solid var(--border-light)',
-                  background: country === 'KR' ? 'var(--bg-hover)' : 'transparent',
-                  fontWeight: 800,
-                  cursor: 'pointer',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
+                  gap: '8px',
+                  background: 'var(--bg-hover)',
+                  padding: '5px',
+                  borderRadius: '18px',
                 }}
               >
-                <span>🇰🇷</span>
-                <span>대한민국 (250곳)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setCountry('JP')}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '14px',
-                  border: country === 'JP' ? '2px solid #f43f5e' : '1px solid var(--border-light)',
-                  background: country === 'JP' ? 'var(--bg-hover)' : 'transparent',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span>🇯🇵</span>
-                <span>일본 (47개 도도부현)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 2. 여행 제목 */}
-          <div className="form-group">
-            <label className="form-label">여행 제목 *</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder={country === 'JP' ? '예: 3박 4일 도쿄 디즈니 & 시부야 힐링 여행' : '예: 8월 부산 사하구 다대포 힐링 여행'}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* 3. 여행 날짜 */}
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">시작 날짜</label>
-              <input
-                type="date"
-                className="form-input"
-                value={startDate}
-                onChange={e => {
-                  setStartDate(e.target.value);
-                  if (e.target.value > endDate) setEndDate(e.target.value);
-                }}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">종료 날짜</label>
-              <input
-                type="date"
-                className="form-input"
-                value={endDate}
-                min={startDate}
-                onChange={e => setEndDate(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          {/* 4. 방문 지역 선택 */}
-          <div className="form-group">
-            <label className="form-label">
-              {country === 'JP' ? '방문한 일본 도도부현 *' : '방문한 지역 (시/군/구) *'}
-            </label>
-
-            {country === 'KR' ? (
-              <div className="form-row" style={{ gap: '8px' }}>
-                <select
-                  className="form-select"
-                  value={selectedSdo}
-                  onChange={e => {
-                    setSelectedSdo(e.target.value);
-                    setSelectedSigCode('');
+                <button
+                  type="button"
+                  onClick={() => handleCountryChange('KR')}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    borderRadius: '14px',
+                    border: 'none',
+                    background: country === 'KR' ? 'var(--bg-surface)' : 'transparent',
+                    color: country === 'KR' ? '#3182f6' : 'var(--text-secondary)',
+                    fontWeight: 800,
+                    fontSize: '0.94rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: country === 'KR' ? '0 4px 14px rgba(0,0,0,0.06)' : 'none',
+                    transition: 'all 0.2s ease',
                   }}
-                  style={{ flex: 1 }}
                 >
-                  {sdoList.map(sdo => (
-                    <option key={sdo} value={sdo}>
-                      {sdo}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="form-select"
-                  value={selectedSigCode}
-                  onChange={e => setSelectedSigCode(e.target.value)}
-                  style={{ flex: 1.5 }}
-                >
-                  <option value="">시/군/구 선택</option>
-                  {currentSdoDistricts.map(dist => (
-                    <option key={dist.code} value={dist.code}>
-                      {dist.name}
-                    </option>
-                  ))}
-                </select>
+                  <span style={{ fontSize: '1.1rem' }}>🇰🇷</span>
+                  <span>대한민국 (250곳)</span>
+                </button>
 
                 <button
                   type="button"
-                  className="btn btn-outline"
-                  style={{ padding: '8px 14px' }}
-                  onClick={() => {
-                    const dist = getDistrictByCode(selectedSigCode);
-                    if (dist) handleAddDistrict(dist);
+                  onClick={() => handleCountryChange('JP')}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    borderRadius: '14px',
+                    border: 'none',
+                    background: country === 'JP' ? 'var(--bg-surface)' : 'transparent',
+                    color: country === 'JP' ? '#f43f5e' : 'var(--text-secondary)',
+                    fontWeight: 800,
+                    fontSize: '0.94rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: country === 'JP' ? '0 4px 14px rgba(0,0,0,0.06)' : 'none',
+                    transition: 'all 0.2s ease',
                   }}
-                  disabled={!selectedSigCode}
                 >
-                  추가
+                  <span style={{ fontSize: '1.1rem' }}>🇯🇵</span>
+                  <span>일본 (47개 도도부현)</span>
                 </button>
               </div>
-            ) : (
-              <div className="form-row" style={{ gap: '8px' }}>
-                <select
-                  className="form-select"
-                  value={selectedJapanRegion}
+            </div>
+
+            {/* 2. 여행 제목 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>여행 제목</span>
+                <span style={{ color: brandColor }}>*</span>
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder={isJapan ? '예: 후쿠오카 & 유후인 온천 3박 4일 힐링 여행' : '예: 8월 부산 사하구 다대포 힐링 여행'}
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                required
+                style={{ fontSize: '1rem' }}
+              />
+            </div>
+
+            {/* 3. 여행 날짜 (시작일 / 종료일 2열 그리드) */}
+            <div className="form-row" style={{ gap: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">시작 날짜</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={startDate}
                   onChange={e => {
-                    setSelectedJapanRegion(e.target.value);
-                    setSelectedJapanPrefCode('');
+                    setStartDate(e.target.value);
+                    if (e.target.value > endDate) setEndDate(e.target.value);
                   }}
-                  style={{ flex: 1 }}
-                >
-                  {japanRegions.map(reg => (
-                    <option key={reg} value={reg}>
-                      {reg}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="form-select"
-                  value={selectedJapanPrefCode}
-                  onChange={e => setSelectedJapanPrefCode(e.target.value)}
-                  style={{ flex: 1.5 }}
-                >
-                  <option value="">도도부현 선택</option>
-                  {currentJapanPrefectures.map(pref => (
-                    <option key={pref.code} value={pref.code}>
-                      {pref.fullName} ({pref.nameJa})
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  style={{ padding: '8px 14px' }}
-                  onClick={() => handleAddJapanPrefecture(selectedJapanPrefCode)}
-                  disabled={!selectedJapanPrefCode}
-                >
-                  추가
-                </button>
+                  required
+                />
               </div>
-            )}
+              <div className="form-group">
+                <label className="form-label">종료 날짜</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={endDate}
+                  min={startDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-            {/* 선택된 지역 태그 배지들 */}
-            {selectedDistricts.length > 0 && (
-              <div className="selected-districts-list" style={{ marginTop: '10px' }}>
-                {selectedDistricts.map(dist => (
-                  <span key={dist.code} className="district-tag-badge">
-                    <MapPin size={12} />
-                    <span>{dist.fullName}</span>
-                    <button
-                      type="button"
-                      className="tag-remove-btn"
-                      onClick={() => handleRemoveDistrict(dist.code)}
+            {/* 4. 방문 지역 선택 및 추가 바 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>{isJapan ? '방문한 일본 도도부현' : '방문한 지역 (시/군/구)'}</span>
+                <span style={{ color: brandColor }}>*</span>
+                <span className="form-label-desc">지도에 함께 칠해질 지역을 추가하세요</span>
+              </label>
+
+              {country === 'KR' ? (
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <select
+                    className="form-select"
+                    value={selectedSdo}
+                    onChange={e => {
+                      setSelectedSdo(e.target.value);
+                      setSelectedSigCode('');
+                    }}
+                    style={{ flex: 1.1 }}
+                  >
+                    {sdoList.map(sdo => (
+                      <option key={sdo} value={sdo}>
+                        {sdo}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="form-select"
+                    value={selectedSigCode}
+                    onChange={e => setSelectedSigCode(e.target.value)}
+                    style={{ flex: 1.4 }}
+                  >
+                    <option value="">시/군/구 선택</option>
+                    {currentSdoDistricts.map(dist => (
+                      <option key={dist.code} value={dist.code}>
+                        {dist.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ padding: '0 20px', minHeight: '48px', flexShrink: 0 }}
+                    onClick={() => {
+                      const dist = getDistrictByCode(selectedSigCode);
+                      if (dist) handleAddDistrict(dist);
+                    }}
+                    disabled={!selectedSigCode}
+                  >
+                    <Plus size={16} strokeWidth={3} />
+                    <span>추가</span>
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <select
+                    className="form-select"
+                    value={selectedJapanRegion}
+                    onChange={e => {
+                      setSelectedJapanRegion(e.target.value);
+                      setSelectedJapanPrefCode('');
+                    }}
+                    style={{ flex: 1.1 }}
+                  >
+                    {japanRegions.map(reg => (
+                      <option key={reg} value={reg}>
+                        {reg}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="form-select"
+                    value={selectedJapanPrefCode}
+                    onChange={e => setSelectedJapanPrefCode(e.target.value)}
+                    style={{ flex: 1.4 }}
+                  >
+                    <option value="">도도부현 선택</option>
+                    {currentJapanPrefectures.map(pref => (
+                      <option key={pref.code} value={pref.code}>
+                        {pref.fullName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{
+                      padding: '0 20px',
+                      minHeight: '48px',
+                      flexShrink: 0,
+                      background: '#f43f5e',
+                      boxShadow: '0 4px 14px rgba(244, 63, 94, 0.3)',
+                    }}
+                    onClick={() => handleAddJapanPrefecture(selectedJapanPrefCode)}
+                    disabled={!selectedJapanPrefCode}
+                  >
+                    <Plus size={16} strokeWidth={3} />
+                    <span>추가</span>
+                  </button>
+                </div>
+              )}
+
+              {/* 선택된 지역 캡슐 태그들 */}
+              {selectedDistricts.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px' }}>
+                  {selectedDistricts.map(dist => (
+                    <span
+                      key={dist.code}
+                      className={`district-tag-badge ${isJapan ? 'jp-badge' : ''}`}
                     >
-                      <X size={12} />
-                    </button>
-                  </span>
+                      <MapPin size={13} />
+                      <span>{dist.fullName}</span>
+                      <button
+                        type="button"
+                        className="tag-remove-btn"
+                        onClick={() => handleRemoveDistrict(dist.code)}
+                        title="삭제"
+                      >
+                        <X size={13} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 5. 테마 색상 선택 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>지도 색칠 테마 컬러</span>
+                <span className="form-label-desc">지도에서 이 여행에 지정될 대표 색상입니다</span>
+              </label>
+              <div className="color-palette">
+                {PRESET_COLORS.map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`color-chip ${color === c ? 'selected' : ''}`}
+                    style={{ backgroundColor: c }}
+                    onClick={() => setColor(c)}
+                  >
+                    {color === c && <Check size={16} color="#ffffff" strokeWidth={3.5} />}
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
-
-          {/* 5. 테마 색상 선택 */}
-          <div className="form-group">
-            <label className="form-label">지도 색칠 테마 컬러</label>
-            <div className="color-palette">
-              {PRESET_COLORS.map(c => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`color-chip ${color === c ? 'selected' : ''}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => setColor(c)}
-                >
-                  {color === c && <Check size={14} color="#ffffff" strokeWidth={3} />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 6. 사진 업로드 및 EXIF 스마트 분석 영역 */}
-          <div className="form-group">
-            <label className="form-label">
-              여행 사진 첨부 (EXIF 회전 보정 및 날짜/위치 자동 분석)
-            </label>
-
-            <div
-              className="photo-dropzone"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload size={24} style={{ color: 'var(--color-primary)' }} />
-              <p style={{ fontWeight: 700, marginTop: '8px', color: 'var(--text-main)' }}>
-                사진 파일을 클릭하거나 드래그하여 업로드
-              </p>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                사진의 촬영 날짜와 GPS 위치(EXIF)를 자동으로 읽어옵니다.
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={e => handleFilesSelected(e.target.files)}
-              />
             </div>
 
-            {/* 사진 스마트 분석 제안 팝업 배너 */}
-            {exifSuggestion && (
-              <div className="exif-suggestion-box">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} style={{ color: '#f59e0b' }} />
-                  <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>
-                    사진 속 위치와 날짜를 분석했습니다!
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.82rem', marginTop: '6px', color: 'var(--text-secondary)' }}>
-                  <div>📅 추천 일정: {exifSuggestion.startDate} ~ {exifSuggestion.endDate}</div>
-                  {exifSuggestion.districts.length > 0 && (
-                    <div style={{ marginTop: '2px' }}>
-                      📍 감지된 장소:{' '}
-                      {exifSuggestion.districts.map(d => `${d.name} (${d.count}장)`).join(', ')}
-                    </div>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ marginTop: '10px', fontSize: '0.84rem', padding: '6px 12px' }}
-                  onClick={handleApplyExifSuggestion}
+            {/* 6. 사진 업로드 및 EXIF 스마트 분석 영역 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>여행 사진 첨부</span>
+                <span className="form-label-desc">사진의 촬영 날짜와 GPS 위치(EXIF)를 자동 분석합니다</span>
+              </label>
+
+              <div
+                className="photo-dropzone"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    background: isJapan ? 'rgba(244, 63, 94, 0.1)' : 'rgba(49, 130, 246, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: brandColor,
+                  }}
                 >
-                  <Check size={14} />
-                  <span>분석 결과로 일정/지역 자동 채우기</span>
-                </button>
+                  <Upload size={22} />
+                </div>
+                <p style={{ fontWeight: 800, fontSize: '0.96rem', margin: '4px 0 0 0', color: 'var(--text-main)' }}>
+                  사진 파일을 클릭하거나 드래그하여 업로드
+                </p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                  고화질 원본 자동 압축 및 브라우저 내부 안전 보관
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={e => handleFilesSelected(e.target.files)}
+                />
               </div>
-            )}
 
-            {/* 업로드된 사진 썸네일 그리드 */}
-            {uploadedPhotos.length > 0 && (
-              <div className="photo-preview-grid">
-                {uploadedPhotos.map((photo, idx) => (
-                  <div key={photo.id || idx} className="photo-preview-card">
-                    <img src={photo.thumbnailUrl} alt="preview" />
-                    <button
-                      type="button"
-                      className="photo-remove-btn"
-                      onClick={() => handleRemoveUploadedPhoto(idx)}
-                    >
-                      <X size={14} />
-                    </button>
+              {/* 사진 스마트 분석 제안 팝업 배너 */}
+              {exifSuggestion && (
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%)',
+                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    borderRadius: '20px',
+                    padding: '16px 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    marginTop: '4px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={18} style={{ color: '#f59e0b' }} />
+                    <span style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-main)' }}>
+                      사진 속 위치와 날짜를 스마트하게 분석했습니다!
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* 7. 여행 만족도 및 태그 */}
-          <div className="form-row">
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">여행 만족도</label>
-              <div className="rating-stars" style={{ display: 'flex', gap: '4px' }}>
-                {[1, 2, 3, 4, 5].map(star => (
+                  <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <div>📅 추천 일정: <b>{exifSuggestion.startDate} ~ {exifSuggestion.endDate}</b></div>
+                    {exifSuggestion.districts.length > 0 && (
+                      <div style={{ marginTop: '2px' }}>
+                        📍 감지된 장소:{' '}
+                        <b>{exifSuggestion.districts.map(d => `${d.name} (${d.count}장)`).join(', ')}</b>
+                      </div>
+                    )}
+                  </div>
                   <button
-                    key={star}
                     type="button"
-                    onClick={() => setRating(star)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                    className="btn btn-primary"
+                    style={{
+                      alignSelf: 'flex-start',
+                      fontSize: '0.86rem',
+                      padding: '8px 16px',
+                      background: '#f59e0b',
+                      boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)',
+                    }}
+                    onClick={handleApplyExifSuggestion}
                   >
-                    <Star
-                      size={22}
-                      fill={star <= rating ? '#f59e0b' : 'none'}
-                      stroke={star <= rating ? '#f59e0b' : 'var(--text-muted)'}
-                    />
+                    <Check size={14} strokeWidth={2.8} />
+                    <span>분석 결과로 일정/지역 자동 채우기</span>
                   </button>
-                ))}
+                </div>
+              )}
+
+              {/* 업로드된 사진 썸네일 그리드 */}
+              {uploadedPhotos.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', marginTop: '6px' }}>
+                  {uploadedPhotos.map((photo, idx) => (
+                    <div
+                      key={photo.id || idx}
+                      style={{
+                        aspectRatio: '1',
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        boxShadow: 'var(--shadow-sm)',
+                      }}
+                    >
+                      <img
+                        src={photo.thumbnailUrl}
+                        alt="preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveUploadedPhoto(idx)}
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          right: '4px',
+                          background: 'rgba(0, 0, 0, 0.65)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '22px',
+                          height: '22px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 7. 여행 만족도 및 테마 태그 */}
+            <div className="form-row" style={{ gap: '20px' }}>
+              <div className="form-group">
+                <label className="form-label">여행 만족도</label>
+                <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                    >
+                      <Star
+                        size={26}
+                        fill={star <= rating ? '#f59e0b' : 'none'}
+                        stroke={star <= rating ? '#f59e0b' : 'var(--text-muted)'}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">테마 태그</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {PRESET_TAGS.map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      className={`district-tag-badge ${tags.includes(tag) ? (isJapan ? 'jp-badge' : '') : ''}`}
+                      style={{
+                        background: tags.includes(tag) ? (isJapan ? 'rgba(244, 63, 94, 0.15)' : 'rgba(49, 130, 246, 0.15)') : 'var(--bg-hover)',
+                        color: tags.includes(tag) ? brandColor : 'var(--text-secondary)',
+                        borderColor: tags.includes(tag) ? brandColor : 'transparent',
+                        cursor: 'pointer',
+                        padding: '6px 12px',
+                        fontSize: '0.84rem',
+                      }}
+                      onClick={() => handleTagToggle(tag)}
+                    >
+                      #{tag}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="form-group" style={{ flex: 2 }}>
-              <label className="form-label">테마 태그</label>
-              <div className="tags-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {PRESET_TAGS.map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    className={`tag-btn ${tags.includes(tag) ? 'selected' : ''}`}
-                    onClick={() => handleTagToggle(tag)}
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
+            {/* 8. 여행 소감 및 메모 */}
+            <div className="form-group">
+              <label className="form-label">
+                <span>여행 메모 & 소감</span>
+                <span className="form-label-desc">자유롭게 기록을 남겨보세요</span>
+              </label>
+              <textarea
+                className="form-textarea"
+                rows={3}
+                placeholder="이번 여행에서 가장 기억에 남는 순간이나 맛집, 팁을 기록해보세요."
+                value={memo}
+                onChange={e => setMemo(e.target.value)}
+                style={{ lineHeight: 1.6 }}
+              />
             </div>
+
           </div>
 
-          {/* 8. 여행 소감 및 메모 */}
-          <div className="form-group">
-            <label className="form-label">여행 메모 & 소감</label>
-            <textarea
-              className="form-textarea"
-              rows={3}
-              placeholder="이번 여행에서 가장 기억에 남는 순간이나 맛집, 팁을 기록해보세요."
-              value={memo}
-              onChange={e => setMemo(e.target.value)}
-            />
-          </div>
-
-          <div className="modal-footer">
-            <button type="button" className="btn btn-subtle" onClick={onClose} disabled={isSubmitting}>
+          {/* 모달 푸터 */}
+          <div className="modal-footer" style={{ padding: '18px 30px' }}>
+            <button
+              type="button"
+              className="btn btn-subtle"
+              onClick={onClose}
+              disabled={isSubmitting}
+              style={{ minWidth: '88px', minHeight: '48px' }}
+            >
               취소
             </button>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              <span>{isSubmitting ? '저장 중...' : '기록 저장'}</span>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+              style={{
+                minWidth: '140px',
+                minHeight: '48px',
+                fontSize: '0.98rem',
+                fontWeight: 800,
+                background: brandColor,
+                boxShadow: `0 4px 14px ${isJapan ? 'rgba(244, 63, 94, 0.3)' : 'rgba(49, 130, 246, 0.3)'}`,
+              }}
+            >
+              <span>{isSubmitting ? '저장 중...' : (editingTrip ? '수정 완료' : '기록 저장하기')}</span>
             </button>
           </div>
         </form>

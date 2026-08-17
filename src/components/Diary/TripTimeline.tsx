@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, MapPin, Star, Image as ImageIcon, Plus, Search, Filter, ArrowUpDown, Clock } from 'lucide-react';
+import { Calendar, MapPin, Star, Image as ImageIcon, Plus, Search, Filter, ArrowUpDown, Clock, QrCode } from 'lucide-react';
 import { Trip, PhotoItem } from '../../types/travel';
 
 interface TripTimelineProps {
@@ -265,7 +265,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
               <div style={{ padding: '18px 20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
                         {trip.title}
                       </h3>
@@ -281,6 +281,26 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
                       >
                         {durationText}
                       </span>
+
+                      {/* QR 패스 등록 뱃지 */}
+                      {trip.itinerary && trip.itinerary.some(i => i.qrCodeData || i.qrImageUrl) && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            background: trip.country === 'JP' ? 'rgba(244, 63, 94, 0.12)' : 'rgba(49, 130, 246, 0.12)',
+                            color: trip.country === 'JP' ? '#f43f5e' : '#3182f6',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            fontWeight: 800,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                          }}
+                        >
+                          <QrCode size={11} />
+                          <span>QR 패스 {trip.itinerary.filter(i => i.qrCodeData || i.qrImageUrl).length}곳</span>
+                        </span>
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginTop: '6px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>

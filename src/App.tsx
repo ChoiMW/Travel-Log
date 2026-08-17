@@ -200,7 +200,13 @@ export const App: React.FC = () => {
 
   const handleUpdateTrip = async (updatedTrip: Trip) => {
     await saveTrip(updatedTrip);
-    setTrips(prev => prev.map(t => t.id === updatedTrip.id ? updatedTrip : t));
+    setTrips(prev => {
+      const exists = prev.some(t => t.id === updatedTrip.id);
+      if (exists) {
+        return prev.map(t => t.id === updatedTrip.id ? updatedTrip : t);
+      }
+      return [updatedTrip, ...prev];
+    });
     if (selectedTripForDetail && selectedTripForDetail.id === updatedTrip.id) {
       setSelectedTripForDetail(updatedTrip);
     }

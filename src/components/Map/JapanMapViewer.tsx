@@ -19,15 +19,15 @@ interface JapanMapViewerProps {
 }
 
 const regionViewBoxes: Record<string, string> = {
-  '전체 (47개 도도부현)': '-100 0 1200 950',
-  '간토 지방': '480 540 240 230',
-  '간사이 지방': '250 580 200 240',
-  '규슈 지방': '-40 700 300 300',
-  '홋카이도 지방': '560 60 340 300',
-  '주부 지방': '360 480 240 300',
-  '도호쿠 지방': '560 300 200 320',
-  '주고쿠 지방': '40 600 260 200',
-  '시코쿠 지방': '120 700 220 200',
+  '전체 (47개 도도부현)': '-10 10 1120 890',
+  '홋카이도 지방': '590 10 540 300',
+  '도호쿠 지방': '580 230 220 310',
+  '간토 지방': '560 460 200 210',
+  '주부 지방': '440 450 200 200',
+  '간사이 지방': '370 540 160 160',
+  '주고쿠 지방': '210 540 180 140',
+  '시코쿠 지방': '260 610 160 120',
+  '규슈 지방': '20 580 280 270',
 };
 
 // 8대 지방 중심 메타데이터 (저배율 줌아웃 시 단일 캡슐 렌더링)
@@ -38,14 +38,14 @@ interface JapanRegionMeta {
 }
 
 const JAPAN_REGION_METAS: JapanRegionMeta[] = [
-  { name: '홋카이도', fullName: '홋카이도 지방', center: { svgX: 710, svgY: 180 } },
-  { name: '도호쿠', fullName: '도호쿠 지방', center: { svgX: 650, svgY: 430 } },
-  { name: '간토 (도쿄)', fullName: '간토 지방', center: { svgX: 600, svgY: 640 } },
-  { name: '주부 (나고야)', fullName: '주부 지방', center: { svgX: 470, svgY: 620 } },
-  { name: '간사이 (오사카)', fullName: '간사이 지방', center: { svgX: 340, svgY: 670 } },
-  { name: '주고쿠 (히로시마)', fullName: '주고쿠 지방', center: { svgX: 160, svgY: 670 } },
-  { name: '시코쿠', fullName: '시코쿠 지방', center: { svgX: 220, svgY: 760 } },
-  { name: '규슈 (후쿠오카)', fullName: '규슈 지방', center: { svgX: 60, svgY: 820 } },
+  { name: '홋카이도', fullName: '홋카이도 지방', center: { svgX: 840, svgY: 150 } },
+  { name: '도호쿠', fullName: '도호쿠 지방', center: { svgX: 690, svgY: 390 } },
+  { name: '간토 (도쿄)', fullName: '간토 지방', center: { svgX: 640, svgY: 545 } },
+  { name: '주부 (나고야)', fullName: '주부 지방', center: { svgX: 530, svgY: 545 } },
+  { name: '간사이 (오사카)', fullName: '간사이 지방', center: { svgX: 430, svgY: 610 } },
+  { name: '주고쿠 (히로시마)', fullName: '주고쿠 지방', center: { svgX: 300, svgY: 605 } },
+  { name: '시코쿠', fullName: '시코쿠 지방', center: { svgX: 335, svgY: 660 } },
+  { name: '규슈 (후쿠오카)', fullName: '규슈 지방', center: { svgX: 180, svgY: 700 } },
 ];
 
 type ExportTemplate = 'story' | 'toss' | 'passport';

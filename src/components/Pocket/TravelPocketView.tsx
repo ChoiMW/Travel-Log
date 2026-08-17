@@ -8,6 +8,8 @@ import {
 import { QRPassModal, MobileTicketItem } from './QRPassModal';
 import { FukuokaTransitCalculatorModal } from './FukuokaTransitCalculatorModal';
 import { Trip, PackingItem, ExpenseItem, ItineraryItem } from '../../types/travel';
+import { RoutePlannerSection } from './RoutePlannerSection';
+import { FUKUOKA_3N4D_TRIP_SAMPLE } from '../../data/fukuoka3N4DRoute';
 
 interface TravelPocketViewProps {
   trips: Trip[];
@@ -60,56 +62,9 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
   };
 
   // ==========================================
-  // 1. [신규 1단계] 일자별 일정표 (Itinerary) 핸들러
+  // 1. 일자별 여행 루트 플래너 (Itinerary)
   // ==========================================
   const itinerary = currentTrip?.itinerary || [];
-  const [selectedDay, setSelectedDay] = useState<number>(1);
-  const [isAddingItinerary, setIsAddingItinerary] = useState<boolean>(false);
-  const [newPlaceName, setNewPlaceName] = useState('');
-  const [newPlaceTime, setNewPlaceTime] = useState('');
-  const [newPlaceCategory, setNewPlaceCategory] = useState<'spot' | 'food' | 'cafe' | 'hotel' | 'etc'>('spot');
-  const [newPlaceMemo, setNewPlaceMemo] = useState('');
-
-  const currentDayItems = itinerary
-    .filter(item => item.day === selectedDay)
-    .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-
-  const handleAddItinerary = () => {
-    const isJapan = currentTrip?.country === 'JP';
-    const mapUrl = isJapan
-      ? `https://www.google.com/maps/search/${encodeURIComponent(newPlaceName.trim())}`
-      : `https://map.naver.com/v5/search/${encodeURIComponent(newPlaceName.trim())}`;
-
-    const newItem: ItineraryItem = {
-      id: `itin_${Date.now()}`,
-      day: selectedDay,
-      time: newPlaceTime.trim(),
-      placeName: newPlaceName.trim(),
-      category: newPlaceCategory,
-      memo: newPlaceMemo.trim(),
-      mapUrl,
-    };
-
-    const updated: Trip = {
-      ...currentTrip,
-      itinerary: [...(currentTrip.itinerary || []), newItem],
-    };
-    onUpdateTrip(updated);
-
-    setNewPlaceName('');
-    setNewPlaceTime('');
-    setNewPlaceMemo('');
-    setIsAddingItinerary(false);
-  };
-
-  const deleteItineraryItem = (id: string) => {
-    if (!currentTrip) return;
-    const updated: Trip = {
-      ...currentTrip,
-      itinerary: (currentTrip.itinerary || []).filter(item => item.id !== id),
-    };
-    onUpdateTrip(updated);
-  };
 
   // ==========================================
   // 2. 모바일 티켓 & QR 퀵패스 월렛 핸들러
@@ -283,14 +238,31 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
         <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginTop: '8px', maxWidth: '440px', margin: '8px auto 24px', lineHeight: 1.5 }}>
           여행을 떠나기 전, 여행지와 날짜를 먼저 정하고 <b>일정표, KTX/항공권 QR 티켓, 짐싸기 체크리스트</b>를 미리 준비해 보세요!
         </p>
-        <button
-          className="btn btn-primary"
-          style={{ padding: '14px 28px', fontSize: '1rem', fontWeight: 800 }}
-          onClick={onOpenNewTripPlan}
-        >
-          <Plus size={20} />
-          <span>새 여행 계획 등록하기</span>
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-primary"
+            style={{ padding: '14px 28px', fontSize: '0.98rem', fontWeight: 800 }}
+            onClick={onOpenNewTripPlan}
+          >
+            <Plus size={20} />
+            <span>새 여행 계획 등록하기</span>
+          </button>
+
+          <button
+            className="btn btn-subtle"
+            style={{
+              padding: '14px 24px',
+              fontSize: '0.95rem',
+              fontWeight: 800,
+              color: '#f43f5e',
+              background: 'rgba(244, 63, 94, 0.1)',
+            }}
+            onClick={() => onUpdateTrip(FUKUOKA_3N4D_TRIP_SAMPLE)}
+          >
+            <Sparkles size={18} />
+            <span>✨ 후쿠오카 3박 4일 샘플 생성</span>
+          </button>
+        </div>
       </div>
     );
   }
@@ -371,13 +343,13 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
           <button
             onClick={() => setActiveTab('itinerary')}
             style={{
-              padding: '8px 14px',
+              padding: '8px 16px',
               borderRadius: '12px',
               border: 'none',
-              background: activeTab === 'itinerary' ? '#3182f6' : 'transparent',
+              background: activeTab === 'itinerary' ? (currentTrip.country === 'JP' ? '#f43f5e' : '#3182f6') : 'transparent',
               color: '#ffffff',
               fontWeight: 800,
-              fontSize: '0.84rem',
+              fontSize: '0.86rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -385,8 +357,8 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
               whiteSpace: 'nowrap',
             }}
           >
-            <Calendar size={15} />
-            <span>일정표 ({itinerary.length})</span>
+            <Compass size={16} />
+            <span>일정/루트 ({itinerary.length})</span>
           </button>
 
           <button
@@ -395,7 +367,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
               padding: '8px 14px',
               borderRadius: '12px',
               border: 'none',
-              background: activeTab === 'tickets' ? '#3182f6' : 'transparent',
+              background: activeTab === 'tickets' ? (currentTrip.country === 'JP' ? '#f43f5e' : '#3182f6') : 'transparent',
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '0.84rem',
@@ -416,7 +388,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
               padding: '8px 14px',
               borderRadius: '12px',
               border: 'none',
-              background: activeTab === 'packing' ? '#3182f6' : 'transparent',
+              background: activeTab === 'packing' ? (currentTrip.country === 'JP' ? '#f43f5e' : '#3182f6') : 'transparent',
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '0.84rem',
@@ -437,7 +409,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
               padding: '8px 14px',
               borderRadius: '12px',
               border: 'none',
-              background: activeTab === 'expense' ? '#3182f6' : 'transparent',
+              background: activeTab === 'expense' ? (currentTrip.country === 'JP' ? '#f43f5e' : '#3182f6') : 'transparent',
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '0.84rem',
@@ -455,203 +427,14 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
       </div>
 
       {/* =========================================================================
-          탭 1: 📅 [1단계 고도화] 일자별 일정표 (Day-by-Day Itinerary)
+          탭 1: 🧭 [트리플 스타일] 일자별 여행 루트 플래너 (Itinerary / Route Planner)
           ========================================================================= */}
       {activeTab === 'itinerary' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* Day 선택 탭 & 스팟 추가 버튼 */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {[1, 2, 3, 4, 5].map(dayNum => (
-                <button
-                  key={dayNum}
-                  onClick={() => setSelectedDay(dayNum)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '14px',
-                    border: 'none',
-                    background: selectedDay === dayNum ? '#3182f6' : 'var(--bg-hover)',
-                    color: selectedDay === dayNum ? '#ffffff' : 'var(--text-secondary)',
-                    fontWeight: 800,
-                    fontSize: '0.86rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Day {dayNum} ({itinerary.filter(i => i.day === dayNum).length})
-                </button>
-              ))}
-            </div>
-
-            <button
-              className="btn btn-primary"
-              style={{ padding: '8px 16px', fontSize: '0.86rem' }}
-              onClick={() => setIsAddingItinerary(prev => !prev)}
-            >
-              <Plus size={16} />
-              <span>Day {selectedDay} 일정 추가</span>
-            </button>
-          </div>
-
-          {/* 일정 추가 폼 */}
-          {isAddingItinerary && (
-            <div
-              style={{
-                background: 'var(--bg-surface)',
-                borderRadius: '24px',
-                padding: '22px',
-                boxShadow: 'var(--shadow-lg)',
-                border: '2px solid #3182f6',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                animation: 'slideUp 0.25s ease',
-              }}
-            >
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 900 }}>Day {selectedDay} 방문 스팟 추가</h3>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label className="form-label">장소/스팟 이름</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="예: 해운대 해수욕장, 광안리 맛집"
-                    value={newPlaceName}
-                    onChange={e => setNewPlaceName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="form-label">방문 시간 (선택)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="예: 11:30"
-                    value={newPlaceTime}
-                    onChange={e => setNewPlaceTime(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="form-label">카테고리</label>
-                  <select
-                    className="form-select"
-                    value={newPlaceCategory}
-                    onChange={e => setNewPlaceCategory(e.target.value as any)}
-                  >
-                    <option value="spot">🏛️ 관광/명소</option>
-                    <option value="food">🍲 맛집/식당</option>
-                    <option value="cafe">☕ 감성 카페</option>
-                    <option value="hotel">🏨 숙소</option>
-                    <option value="etc">📍 기타</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="form-label">메모 (메뉴, 예약 등)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="예: 밀면 곱빼기 추천, 대기 20분 예상"
-                  value={newPlaceMemo}
-                  onChange={e => setNewPlaceMemo(e.target.value)}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                <button className="btn btn-subtle" onClick={() => setIsAddingItinerary(false)}>취소</button>
-                <button className="btn btn-primary" onClick={handleAddItinerary}>
-                  <span>일정표에 등록</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 일정표 타임라인 리스트 */}
-          {currentDayItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-surface)', borderRadius: '24px' }}>
-              <Calendar size={44} style={{ margin: '0 auto 10px', color: 'var(--text-muted)', opacity: 0.5 }} />
-              <p style={{ fontWeight: 800, color: 'var(--text-main)' }}>Day {selectedDay} 일정이 아직 없습니다</p>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                방문할 명소나 맛집을 등록하면 네이버/카카오 지도 길찾기 링크가 자동으로 연결됩니다.
-              </p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {currentDayItems.map((item, idx) => (
-                <div
-                  key={item.id}
-                  style={{
-                    background: 'var(--bg-surface)',
-                    borderRadius: '20px',
-                    padding: '16px 20px',
-                    boxShadow: 'var(--shadow-sm)',
-                    border: '1px solid var(--border-light)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-                    <div
-                      style={{
-                        width: '38px',
-                        height: '38px',
-                        borderRadius: '12px',
-                        background: 'var(--bg-hover)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {getCategoryIcon(item.category)}
-                    </div>
-
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {item.time && (
-                          <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#3182f6' }}>
-                            {item.time}
-                          </span>
-                        )}
-                        <h4 style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {item.placeName}
-                        </h4>
-                      </div>
-                      {item.memo && (
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          {item.memo}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                    {item.mapUrl && (
-                      <a
-                        href={item.mapUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn btn-subtle"
-                        style={{ padding: '8px 12px', fontSize: '0.78rem', fontWeight: 800, textDecoration: 'none' }}
-                      >
-                        <Navigation2 size={13} />
-                        <span>길찾기</span>
-                      </a>
-                    )}
-                    <button
-                      onClick={() => deleteItineraryItem(item.id)}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <RoutePlannerSection
+          trip={currentTrip}
+          onUpdateTrip={onUpdateTrip}
+          onOpenTransitCalc={() => setIsTransitCalcOpen(true)}
+        />
       )}
 
       {/* =========================================================================

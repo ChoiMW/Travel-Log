@@ -74,15 +74,27 @@ export interface ExpenseItem {
   currency?: 'KRW' | 'JPY';
 }
 
-// 일자별 일정표 아이템 (Day-by-Day Itinerary)
+// 일자별 트리플 스타일 일정/루트 아이템 (Day-by-Day Route Itinerary)
 export interface ItineraryItem {
   id: string;
   day: number; // 1일차, 2일차...
-  time?: string; // 10:30
+  date?: string; // '2026-08-17'
+  time?: string; // '10:30'
   placeName: string;
-  category: 'spot' | 'food' | 'cafe' | 'hotel' | 'etc';
+  category: 'spot' | 'food' | 'cafe' | 'shopping' | 'hotel' | 'transit' | 'etc';
   memo?: string;
   mapUrl?: string; // 네이버지도 / 구글맵 링크
+  isCompleted?: boolean; // 방문 완료 여부
+  // 다음 장소까지의 이동 정보
+  transitType?: 'walk' | 'subway' | 'bus' | 'taxi' | 'car';
+  transitDuration?: number; // 분 단위 (예: 15분)
+  transitFare?: number; // 요금 (엔화/원화)
+  cost?: number; // 해당 장소 예상 비용
+  // 현장 사용 모바일 티켓 / 캡처 사진 / 바코드 / QR 바우처
+  ticketImageUrl?: string; // 업로드된 캡처 사진, 바코드, 모바일 티켓 이미지 URL
+  ticketImageName?: string; // 첨부된 티켓 파일명
+  qrImageUrl?: string; // (호환용) QR 이미지 URL
+  qrCodeData?: string; // QR 생성 텍스트 또는 URL
 }
 
 // 개별 여행(Trip) 엔티티
