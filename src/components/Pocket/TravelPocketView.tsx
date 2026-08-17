@@ -6,6 +6,7 @@ import {
   Navigation2, Utensils, Coffee, Bed, Landmark
 } from 'lucide-react';
 import { QRPassModal, MobileTicketItem } from './QRPassModal';
+import { FukuokaTransitCalculatorModal } from './FukuokaTransitCalculatorModal';
 import { Trip, PackingItem, ExpenseItem, ItineraryItem } from '../../types/travel';
 
 interface TravelPocketViewProps {
@@ -23,6 +24,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
 }) => {
   const [selectedTripId, setSelectedTripId] = useState<string>(() => defaultTripId || trips[0]?.id || '');
   const [activeTab, setActiveTab] = useState<'itinerary' | 'tickets' | 'packing' | 'expense'>('itinerary');
+  const [isTransitCalcOpen, setIsTransitCalcOpen] = useState<boolean>(false);
 
   // defaultTripId가 외부에서 변경될 때 자동 전환
   useEffect(() => {
@@ -1005,6 +1007,57 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
             </div>
           </div>
 
+          {/* ⚡ 후쿠오카/일본 교통요금 스마트 계산기 배너 */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
+              border: '1px solid #fecdd3',
+              borderRadius: '20px',
+              padding: '16px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(244, 63, 94, 0.08)',
+              transition: 'transform 0.15s ease',
+            }}
+            onClick={() => setIsTransitCalcOpen(true)}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ background: '#f43f5e', color: 'white', padding: '10px', borderRadius: '14px', fontSize: '1.2rem' }}>
+                ⚡
+              </div>
+              <div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#9f1239' }}>
+                  후쿠오카 교통요금 스마트 자동 계산기
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#be123c', marginTop: '2px' }}>
+                  후쿠오카 공항, 하카타, 텐진, 다자이후, 택시 요금 선택 시 가계부에 엔화(¥)로 1초 자동 등록!
+                </div>
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary"
+              style={{
+                background: '#f43f5e',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '12px',
+                fontSize: '0.84rem',
+                fontWeight: 800,
+                border: 'none',
+                flexShrink: 0,
+              }}
+              onClick={e => {
+                e.stopPropagation();
+                setIsTransitCalcOpen(true);
+              }}
+            >
+              요금 계산기 열기
+            </button>
+          </div>
+
           <div style={{ background: 'var(--bg-surface)', borderRadius: '26px', padding: '24px', boxShadow: 'var(--shadow-md)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
@@ -1067,7 +1120,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--text-main)' }}>
-                      {item.amount.toLocaleString()}원
+                      {currencyPrefix}{item.amount.toLocaleString()}{currencySuffix}
                     </span>
                     <button onClick={() => deleteExpenseItem(item.id)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                       <Trash2 size={16} />
@@ -1087,6 +1140,27 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
         onClose={() => {
           setIsQRModalOpen(false);
           setSelectedTicketForQR(null);
+        }}
+      />
+
+      {/* ⚡ 후쿠오카 교통요금 자동 계산기 모달 */}
+      <FukuokaTransitCalculatorModal
+        isOpen={isTransitCalcOpen}
+        onClose={() => setIsTransitCalcOpen(false)}
+        onAddExpense={(expense) => {
+          if (!currentTrip) return;
+          const newExpItem: ExpenseItem = {
+            id: `exp_${Date.now()}`,
+            title: expense.title,
+            amount: expense.amount,
+            category: expense.category,
+            currency: currentTrip.country === 'JP' ? 'JPY' : 'KRW',
+          };
+          const updated: Trip = {
+            ...currentTrip,
+            expenses: [...(currentTrip.expenses || []), newExpItem],
+          };
+          onUpdateTrip(updated);
         }}
       />
     </div>
