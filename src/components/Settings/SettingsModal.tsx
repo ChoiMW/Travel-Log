@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Upload, ShieldCheck, Smartphone, RefreshCw, Trash2, CheckCircle2, AlertTriangle, FileArchive, FileText, Sparkles, HardDrive, Database } from 'lucide-react';
+import { Download, Upload, ShieldCheck, Smartphone, RefreshCw, Trash2, CheckCircle2, AlertTriangle, FileArchive, FileText, Sparkles, HardDrive, Database, X } from 'lucide-react';
 import { exportToJson, exportToZip, importFromJson, importFromZip } from '../../utils/backup';
 import { clearAllData, saveTrip } from '../../db';
 import { Trip } from '../../types/travel';
@@ -180,16 +180,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div>
-        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
-          백업 및 데이터 설정
-        </h2>
-        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-          개인정보 로컬 보관 및 백업/복원, 브라우저 저장 용량 확인
-        </p>
-      </div>
+    <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 100 }}>
+      <div
+        className="modal-content"
+        onClick={e => e.stopPropagation()}
+        style={{
+          maxWidth: '720px',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          borderRadius: '26px',
+          padding: '26px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          background: 'var(--bg-surface)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
+              ⚙️ 백업 및 데이터 설정
+            </h2>
+            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              개인정보 로컬 보관 및 백업/복원, 브라우저 저장 용량 확인
+            </p>
+          </div>
+
+          <button className="btn-icon" onClick={onClose} title="닫기">
+            <X size={20} />
+          </button>
+        </div>
 
       {statusMessage && (
         <div
@@ -415,6 +438,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <span>데이터 전체 초기화</span>
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

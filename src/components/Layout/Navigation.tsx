@@ -10,6 +10,7 @@ interface NavigationProps {
   selectedCountry: CountryCode;
   onCountryChange: (country: CountryCode) => void;
   onNewTrip: () => void;
+  onOpenSettings?: () => void;
   visitedCount: number;
   totalCount: number;
   isDarkMode: boolean;
@@ -22,6 +23,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   selectedCountry,
   onCountryChange,
   onNewTrip,
+  onOpenSettings,
   visitedCount,
   totalCount,
   isDarkMode,
@@ -168,7 +170,10 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           <button
             className={`btn-icon ${currentTab === 'settings' ? 'active' : ''}`}
-            onClick={() => onTabChange('settings')}
+            onClick={() => {
+              if (onOpenSettings) onOpenSettings();
+              else onTabChange('settings');
+            }}
             title="백업 및 설정"
           >
             <Settings size={20} />

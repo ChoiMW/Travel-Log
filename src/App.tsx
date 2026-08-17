@@ -57,6 +57,9 @@ export const App: React.FC = () => {
   const [selectedPhotoForLightbox, setSelectedPhotoForLightbox] = useState<PhotoItem | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
 
+  // 설정 및 백업 전용 모달 상태
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
   // 데이터 로드
   const loadData = useCallback(async () => {
     try {
@@ -227,6 +230,7 @@ export const App: React.FC = () => {
         selectedCountry={selectedCountry}
         onCountryChange={setSelectedCountry}
         onNewTrip={() => handleOpenNewTrip()}
+        onOpenSettings={() => setIsSettingsOpen(true)}
         visitedCount={visitedSummaryMap.size}
         totalCount={totalDistrictsCount}
         isDarkMode={isDarkMode}
@@ -463,8 +467,8 @@ export const App: React.FC = () => {
 
       {/* 백업 및 설정 모달 */}
       <SettingsModal
-        isOpen={currentTab === 'settings'}
-        onClose={() => setCurrentTab('home')}
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
         onDataChanged={loadData}
       />
     </div>
