@@ -18,15 +18,15 @@ interface JapanMapViewerProps {
 }
 
 const regionViewBoxes: Record<string, string> = {
-  '전체 (47개 도도부현)': '0 0 1000 1000',
+  '전체 (47개 도도부현)': '-100 0 1200 950',
   '간토 지방': '480 540 240 230',
   '간사이 지방': '250 580 200 240',
-  '규슈 지방': '-30 750 250 250',
-  '홋카이도 지방': '560 80 320 280',
+  '규슈 지방': '-40 700 300 300',
+  '홋카이도 지방': '560 60 340 300',
   '주부 지방': '360 480 240 300',
   '도호쿠 지방': '560 300 200 320',
   '주고쿠 지방': '40 600 260 200',
-  '시코쿠 지방': '120 710 200 180',
+  '시코쿠 지방': '120 700 220 200',
 };
 
 // 8대 지방 중심 메타데이터 (저배율 줌아웃 시 단일 캡슐 렌더링)
@@ -37,14 +37,14 @@ interface JapanRegionMeta {
 }
 
 const JAPAN_REGION_METAS: JapanRegionMeta[] = [
-  { name: '홋카이도', fullName: '홋카이도 지방', center: { svgX: 710, svgY: 200 } },
-  { name: '도호쿠', fullName: '도호쿠 지방', center: { svgX: 650, svgY: 450 } },
-  { name: '간토 (도쿄)', fullName: '간토 지방', center: { svgX: 600, svgY: 660 } },
-  { name: '주부 (나고야)', fullName: '주부 지방', center: { svgX: 470, svgY: 640 } },
-  { name: '간사이 (오사카)', fullName: '간사이 지방', center: { svgX: 350, svgY: 690 } },
-  { name: '주고쿠 (히로시마)', fullName: '주고쿠 지방', center: { svgX: 160, svgY: 690 } },
-  { name: '시코쿠', fullName: '시코쿠 지방', center: { svgX: 220, svgY: 790 } },
-  { name: '규슈 (후쿠오카)', fullName: '규슈 지방', center: { svgX: 60, svgY: 860 } },
+  { name: '홋카이도', fullName: '홋카이도 지방', center: { svgX: 710, svgY: 180 } },
+  { name: '도호쿠', fullName: '도호쿠 지방', center: { svgX: 650, svgY: 430 } },
+  { name: '간토 (도쿄)', fullName: '간토 지방', center: { svgX: 600, svgY: 640 } },
+  { name: '주부 (나고야)', fullName: '주부 지방', center: { svgX: 470, svgY: 620 } },
+  { name: '간사이 (오사카)', fullName: '간사이 지방', center: { svgX: 340, svgY: 670 } },
+  { name: '주고쿠 (히로시마)', fullName: '주고쿠 지방', center: { svgX: 160, svgY: 670 } },
+  { name: '시코쿠', fullName: '시코쿠 지방', center: { svgX: 220, svgY: 760 } },
+  { name: '규슈 (후쿠오카)', fullName: '규슈 지방', center: { svgX: 60, svgY: 820 } },
 ];
 
 type ExportTemplate = 'story' | 'toss' | 'passport';

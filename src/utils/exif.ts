@@ -1,5 +1,6 @@
 import exifr from 'exifr';
 import { findDistrictByCoordinates } from './geoMatcher';
+import { findJapanPrefectureByCoordinates } from './japanGeoMatcher';
 
 export interface ParsedPhotoResult {
   id?: string;
@@ -156,10 +157,17 @@ export async function parsePhotoFile(file: File): Promise<ParsedPhotoResult> {
         latitude = Number(exifData.latitude.toFixed(6));
         longitude = Number(exifData.longitude.toFixed(6));
 
-        const matched = findDistrictByCoordinates(latitude, longitude);
-        if (matched) {
-          districtCode = matched.code;
-          districtName = matched.fullName;
+        const matchedKr = findDistrictByCoordinates(latitude, longitude);
+        if (matchedKr) {
+          districtCode = matchedKr.code;
+          districtName = matchedKr.fullName;
+        } else {
+          // 일본 도도부현 지오코딩 시도
+          const matchedJp = findJapanPrefectureByCoordinates(latitude, longitude);
+          if (matchedJp) {
+            districtCode = matchedJp.code;
+            districtName = matchedJp.fullName;
+          }
         }
       }
 

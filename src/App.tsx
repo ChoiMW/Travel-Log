@@ -353,6 +353,7 @@ export const App: React.FC = () => {
           <>
             {currentTab === 'home' && (
               <TossHomeView
+                country={selectedCountry}
                 trips={currentCountryTrips}
                 photos={currentCountryPhotos}
                 visitedSummaryMap={visitedSummaryMap}
@@ -412,6 +413,7 @@ export const App: React.FC = () => {
 
             {currentTab === 'stats' && (
               <StatsDashboard
+                country={selectedCountry}
                 trips={currentCountryTrips}
                 photos={currentCountryPhotos}
                 visitedSummaryMap={visitedSummaryMap}

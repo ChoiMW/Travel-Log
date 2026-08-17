@@ -1,5 +1,6 @@
 import { Trip, DistrictFeatureProperties } from '../types/travel';
 import { findDistrictByCoordinates } from './geoMatcher';
+import { findJapanPrefectureByCoordinates } from './japanGeoMatcher';
 
 export interface ActiveTripMatchResult {
   matchedTrip: Trip | null;
@@ -59,6 +60,19 @@ export async function matchActiveTrip(
   let currentDistrict: DistrictFeatureProperties | null = null;
   if (coords) {
     currentDistrict = findDistrictByCoordinates(coords.lat, coords.lng);
+    if (!currentDistrict) {
+      const jpPref = findJapanPrefectureByCoordinates(coords.lat, coords.lng);
+      if (jpPref) {
+        currentDistrict = {
+          code: jpPref.code,
+          name: jpPref.name,
+          fullName: jpPref.fullName,
+          sdoName: jpPref.regionName,
+          path: jpPref.path,
+          country: 'JP',
+        };
+      }
+    }
   }
 
   // 위치를 알 수 없거나 등록된 여행이 없으면 매칭하지 않음

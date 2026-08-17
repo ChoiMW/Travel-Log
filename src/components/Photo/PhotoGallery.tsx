@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Image as ImageIcon, MapPin, Calendar, Camera, Search, Filter } from 'lucide-react';
 import { PhotoItem, Trip } from '../../types/travel';
-import { sdoList } from '../../utils/geoMatcher';
 
 interface PhotoGalleryProps {
   photos: PhotoItem[];
@@ -15,6 +14,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   onPhotoClick,
 }) => {
   const [selectedTripId, setSelectedTripId] = useState<string>('all');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const tripMap = useMemo(() => {
@@ -23,9 +23,21 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     return map;
   }, [trips]);
 
+  // 사진들로부터 고유 지역 목록 추출
+  const availableDistricts = useMemo(() => {
+    const set = new Set<string>();
+    photos.forEach(p => {
+      if (p.districtName) set.add(p.districtName);
+    });
+    return Array.from(set).sort();
+  }, [photos]);
+
   const filteredPhotos = useMemo(() => {
     return photos.filter(photo => {
       if (selectedTripId !== 'all' && photo.tripId !== selectedTripId) {
+        return false;
+      }
+      if (selectedDistrict !== 'all' && photo.districtName !== selectedDistrict) {
         return false;
       }
       if (searchQuery.trim()) {
@@ -34,11 +46,12 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         const matchTitle = trip?.title.toLowerCase().includes(q);
         const matchDistrict = photo.districtName?.toLowerCase().includes(q);
         const matchDate = photo.takenAt?.toLowerCase().includes(q);
-        if (!matchTitle && !matchDistrict && !matchDate) return false;
+        const matchModel = photo.model?.toLowerCase().includes(q);
+        if (!matchTitle && !matchDistrict && !matchDate && !matchModel) return false;
       }
       return true;
     });
-  }, [photos, selectedTripId, searchQuery, tripMap]);
+  }, [photos, selectedTripId, selectedDistrict, searchQuery, tripMap]);
 
   if (photos.length === 0) {
     return (
@@ -71,11 +84,11 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
           <select
             className="form-select"
-            style={{ width: 'auto', minWidth: '160px', padding: '6px 12px', fontSize: '0.86rem' }}
+            style={{ width: 'auto', minWidth: '150px', padding: '6px 12px', fontSize: '0.86rem' }}
             value={selectedTripId}
             onChange={e => setSelectedTripId(e.target.value)}
           >
-            <option value="all">모든 여행 사진 ({photos.length})</option>
+            <option value="all">모든 여행 ({trips.length})</option>
             {trips.map(trip => (
               <option key={trip.id} value={trip.id}>
                 {trip.title}
@@ -83,14 +96,33 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
             ))}
           </select>
 
-          <input
-            type="text"
-            className="form-input"
-            style={{ width: '180px', padding: '6px 12px', fontSize: '0.86rem' }}
-            placeholder="지역 또는 날짜 검색..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
+          {availableDistricts.length > 0 && (
+            <select
+              className="form-select"
+              style={{ width: 'auto', minWidth: '130px', padding: '6px 12px', fontSize: '0.86rem' }}
+              value={selectedDistrict}
+              onChange={e => setSelectedDistrict(e.target.value)}
+            >
+              <option value="all">모든 지역 ({availableDistricts.length})</option>
+              {availableDistricts.map(dist => (
+                <option key={dist} value={dist}>
+                  {dist}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              className="form-input"
+              style={{ width: '170px', padding: '6px 12px 6px 30px', fontSize: '0.86rem' }}
+              placeholder="지역 또는 날짜 검색..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          </div>
         </div>
       </div>
 
@@ -98,69 +130,57 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-          gap: '12px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: '14px',
         }}
       >
         {filteredPhotos.map(photo => {
-          const displayUrl = photo.thumbnailUrl || (photo.blob ? URL.createObjectURL(photo.blob) : '');
           const trip = tripMap.get(photo.tripId);
-
           return (
             <div
               key={photo.id}
               onClick={() => onPhotoClick(photo)}
               style={{
-                aspectRatio: '1',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: '18px',
                 overflow: 'hidden',
-                position: 'relative',
-                cursor: 'pointer',
-                background: '#e2e8f0',
+                background: 'var(--bg-surface)',
                 boxShadow: 'var(--shadow-sm)',
-                transition: 'all 0.2s ease',
+                border: '1px solid var(--border-light)',
+                cursor: 'pointer',
+                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = 'scale(1.02)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
                 e.currentTarget.style.boxShadow = 'var(--shadow-md)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
-              <img
-                src={displayUrl}
-                alt={photo.fileName}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
+              <div style={{ aspectRatio: '1', width: '100%', overflow: 'hidden', background: '#e2e8f0' }}>
+                <img
+                  src={photo.thumbnailUrl || (photo.blob ? URL.createObjectURL(photo.blob) : '')}
+                  alt={photo.fileName}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
 
-              {/* 하단 오버레이 정보 */}
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 'auto 0 0 0',
-                  padding: '24px 8px 8px',
-                  background: 'linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, transparent 100%)',
-                  color: 'white',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                }}
-              >
-                {photo.districtName && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem', fontWeight: 600 }}>
-                    <MapPin size={12} style={{ color: '#38bdf8' }} />
-                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {photo.districtName}
-                    </span>
-                  </div>
-                )}
+              <div style={{ padding: '12px' }}>
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {trip?.title || '여행'}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem', color: '#f43f5e', fontWeight: 700, marginTop: '4px' }}>
+                  <MapPin size={12} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {photo.districtName || '위치 미상'}
+                  </span>
+                </div>
 
                 {photo.takenAt && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', opacity: 0.85 }}>
-                    <Calendar size={11} />
-                    <span>{photo.takenAt.split('T')[0]}</span>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    {photo.takenAt.split('T')[0]}
                   </div>
                 )}
               </div>
