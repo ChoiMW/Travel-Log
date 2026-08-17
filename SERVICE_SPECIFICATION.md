@@ -226,11 +226,14 @@ export interface PhotoItem {
 - 최신 여행 기록 피드 및 방문 지역 순위(TOP 3).
 - 전국 완주 시 축하 컨페티(Confetti) 폭죽 애니메이션.
 
-### 2. 여행 지도 (`MapViewer.tsx` & `JapanMapViewer.tsx`)
+### 2. 여행 지도 (`MapViewer.tsx` & `JapanMapViewer.tsx` & `GoogleMapsPilotViewer.tsx`)
 - 대한민국 250개 시군구 및 일본 8대 지방 47개 도도부현 2단계 계층형 18배 슈퍼 줌 SVG 지도 엔진.
 - 17개 광역시·도 / 8대 지방 ➔ 250개 세부 시군구 및 47개 도도부현 원클릭 드릴다운.
 - 방문 완료 지역 여행별 커스텀 테마 색상 칠하기.
 - 지역 클릭 시 상단 플로팅 글래스 메모리 카드 (썸네일, 방문 횟수, 최근 여행명).
+- **[신규] Google Maps 인터랙티브 파일럿 뷰어 (`GoogleMapsPilotViewer.tsx`)**:
+  - `[🗺️ 정밀 벡터 정복 지도]` ↔ `[🌐 Google Maps 라이브 (파일럿)]` 실시간 듀얼 뷰 스위칭.
+  - 후쿠오카 및 일본 주요 거점(하카타역, 텐진, 캐널시티, 다자이후, 모모치 해변, 유후인 온천, 시부야, 도톤보리 등) 핫스팟 핀 및 구글 맵스 길찾기 딥링크 1초 연동.
 - 3종 소셜 공유 카드 생성기 탑재 (한국/일본 전용 디자인).
 
 ### 3. 여행 기록 (`TripTimeline.tsx` & `TripDetailModal.tsx`)

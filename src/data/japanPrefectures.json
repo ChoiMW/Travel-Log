@@ -1,617 +1,242 @@
 {
   "type": "FeatureCollection",
-  "name": "JapanPrefectures",
+  "name": "japan_prefectures_detailed",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
   "features": [
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-01",
-        "name": "홋카이도",
-        "fullName": "홋카이도",
-        "nameJa": "北海道",
-        "nameRomaji": "Hokkaido",
-        "regionName": "홋카이도 지방",
-        "path": "M 640 120 L 760 110 L 820 180 L 840 250 L 790 290 L 710 260 L 680 320 L 600 310 L 590 240 L 630 200 Z",
-        "center": { "lat": 43.0618, "lng": 141.3545, "svgX": 710, "svgY": 200 }
-      }
+      "properties": { "code": "JP-01", "name": "홋카이도", "fullName": "홋카이도 (北海道)", "regionName": "홋카이도 지방", "centerLat": 43.064, "centerLng": 141.346, "svgCenter": [730, 180] },
+      "geometry": { "path": "M670,120 C690,100 730,90 760,110 C790,130 830,120 860,140 C880,160 870,190 840,210 C820,230 790,260 760,250 C740,240 710,250 680,230 C660,210 650,180 640,160 C650,140 660,130 670,120 Z M630,220 C640,210 650,230 640,250 C630,270 610,260 620,240 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-02",
-        "name": "아오모리",
-        "fullName": "아오모리현",
-        "nameJa": "青森県",
-        "nameRomaji": "Aomori",
-        "regionName": "도호쿠 지방",
-        "path": "M 630 330 L 690 340 L 710 390 L 660 410 L 610 380 Z",
-        "center": { "lat": 40.8222, "lng": 140.7474, "svgX": 660, "svgY": 370 }
-      }
+      "properties": { "code": "JP-02", "name": "아오모리현", "fullName": "아오모리현 (青森県)", "regionName": "도호쿠 지방", "centerLat": 40.824, "centerLng": 140.74, "svgCenter": [660, 310] },
+      "geometry": { "path": "M635,275 C650,265 675,270 690,285 C700,300 685,325 670,335 C650,335 635,320 630,300 C630,285 635,275 635,275 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-03",
-        "name": "이와테",
-        "fullName": "이와테현",
-        "nameJa": "岩手県",
-        "nameRomaji": "Iwate",
-        "regionName": "도호쿠 지방",
-        "path": "M 660 410 L 720 420 L 710 490 L 650 480 Z",
-        "center": { "lat": 39.7036, "lng": 141.1527, "svgX": 685, "svgY": 450 }
-      }
+      "properties": { "code": "JP-03", "name": "이와테현", "fullName": "이와테현 (岩手県)", "regionName": "도호쿠 지방", "centerLat": 39.703, "centerLng": 141.152, "svgCenter": [680, 380] },
+      "geometry": { "path": "M665,335 C685,330 705,345 715,370 C720,395 705,420 685,425 C670,415 660,390 660,365 C660,345 665,335 665,335 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-04",
-        "name": "미야기",
-        "fullName": "미야기현",
-        "nameJa": "宮城県",
-        "nameRomaji": "Miyagi",
-        "regionName": "도호쿠 지방",
-        "path": "M 650 480 L 705 490 L 690 545 L 640 535 Z",
-        "center": { "lat": 38.2688, "lng": 140.8721, "svgX": 670, "svgY": 515 }
-      }
+      "properties": { "code": "JP-04", "name": "미야기현", "fullName": "미야기현 (宮城県)", "regionName": "도호쿠 지방", "centerLat": 38.268, "centerLng": 140.871, "svgCenter": [675, 455] },
+      "geometry": { "path": "M660,425 C680,420 700,435 705,455 C700,475 680,485 665,485 C655,475 650,450 660,425 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-05",
-        "name": "아키타",
-        "fullName": "아키타현",
-        "nameJa": "秋田県",
-        "nameRomaji": "Akita",
-        "regionName": "도호쿠 지방",
-        "path": "M 610 380 L 660 410 L 650 480 L 600 460 Z",
-        "center": { "lat": 39.7186, "lng": 140.1024, "svgX": 630, "svgY": 435 }
-      }
+      "properties": { "code": "JP-05", "name": "아키타현", "fullName": "아키타현 (秋田県)", "regionName": "도호쿠 지방", "centerLat": 39.718, "centerLng": 140.102, "svgCenter": [635, 375] },
+      "geometry": { "path": "M630,325 C650,325 665,340 665,365 C665,395 645,415 630,415 C615,400 610,365 620,340 C625,330 630,325 630,325 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-06",
-        "name": "야마가타",
-        "fullName": "야마가타현",
-        "nameJa": "山形県",
-        "nameRomaji": "Yamagata",
-        "regionName": "도호쿠 지방",
-        "path": "M 600 460 L 650 480 L 640 535 L 590 515 Z",
-        "center": { "lat": 38.2404, "lng": 140.3636, "svgX": 620, "svgY": 495 }
-      }
+      "properties": { "code": "JP-06", "name": "야마가타현", "fullName": "야마가타현 (山形県)", "regionName": "도호쿠 지방", "centerLat": 38.24, "centerLng": 140.363, "svgCenter": [635, 450] },
+      "geometry": { "path": "M625,415 C645,415 660,430 660,455 C655,475 635,485 620,475 C610,460 615,435 625,415 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-07",
-        "name": "후쿠시마",
-        "fullName": "후쿠시마현",
-        "nameJa": "福島県",
-        "nameRomaji": "Fukushima",
-        "regionName": "도호쿠 지방",
-        "path": "M 590 515 L 690 535 L 680 595 L 580 575 Z",
-        "center": { "lat": 37.7503, "lng": 140.4678, "svgX": 635, "svgY": 555 }
-      }
+      "properties": { "code": "JP-07", "name": "후쿠시마현", "fullName": "후쿠시마현 (福島県)", "regionName": "도호쿠 지방", "centerLat": 37.75, "centerLng": 140.467, "svgCenter": [650, 520] },
+      "geometry": { "path": "M615,485 C645,475 680,480 690,505 C695,535 675,555 645,555 C625,545 610,520 615,485 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-08",
-        "name": "이바라키",
-        "fullName": "이바라키현",
-        "nameJa": "茨城県",
-        "nameRomaji": "Ibaraki",
-        "regionName": "간토 지방",
-        "path": "M 630 590 L 680 600 L 670 655 L 620 645 Z",
-        "center": { "lat": 36.3418, "lng": 140.4468, "svgX": 650, "svgY": 620 }
-      }
+      "properties": { "code": "JP-08", "name": "이바라키현", "fullName": "이바라키현 (茨城県)", "regionName": "간토 지방", "centerLat": 36.341, "centerLng": 140.446, "svgCenter": [650, 585] },
+      "geometry": { "path": "M640,555 C665,555 680,575 680,600 C670,620 650,625 635,615 C630,595 630,570 640,555 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-09",
-        "name": "도치기",
-        "fullName": "도치기현",
-        "nameJa": "栃木県",
-        "nameRomaji": "Tochigi",
-        "regionName": "간토 지방",
-        "path": "M 580 575 L 630 590 L 620 645 L 570 630 Z",
-        "center": { "lat": 36.5658, "lng": 139.8836, "svgX": 600, "svgY": 605 }
-      }
+      "properties": { "code": "JP-09", "name": "도치기현", "fullName": "도치기현 (栃木県)", "regionName": "간토 지방", "centerLat": 36.565, "centerLng": 139.883, "svgCenter": [615, 575] },
+      "geometry": { "path": "M605,545 C625,540 640,555 640,580 C635,605 615,610 600,600 C595,580 595,560 605,545 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-10",
-        "name": "군마",
-        "fullName": "군마현",
-        "nameJa": "群馬県",
-        "nameRomaji": "Gunma",
-        "regionName": "간토 지방",
-        "path": "M 530 565 L 580 575 L 570 630 L 520 620 Z",
-        "center": { "lat": 36.3912, "lng": 139.0608, "svgX": 550, "svgY": 595 }
-      }
+      "properties": { "code": "JP-10", "name": "군마현", "fullName": "군마현 (群馬県)", "regionName": "간토 지방", "centerLat": 36.391, "centerLng": 139.06, "svgCenter": [575, 570] },
+      "geometry": { "path": "M565,540 C590,535 605,550 605,575 C600,600 580,610 560,600 C550,580 550,555 565,540 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-11",
-        "name": "사이타마",
-        "fullName": "사이타마현",
-        "nameJa": "埼玉県",
-        "nameRomaji": "Saitama",
-        "regionName": "간토 지방",
-        "path": "M 540 625 L 610 635 L 600 670 L 530 660 Z",
-        "center": { "lat": 35.8569, "lng": 139.6489, "svgX": 570, "svgY": 645 }
-      }
+      "properties": { "code": "JP-11", "name": "사이타마현", "fullName": "사이타마현 (埼玉県)", "regionName": "간토 지방", "centerLat": 35.856, "centerLng": 139.648, "svgCenter": [595, 620] },
+      "geometry": { "path": "M575,605 C605,600 625,605 630,625 C625,640 600,645 580,640 C565,630 565,615 575,605 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-12",
-        "name": "지바",
-        "fullName": "지바현",
-        "nameJa": "千葉県",
-        "nameRomaji": "Chiba",
-        "regionName": "간토 지방",
-        "path": "M 610 650 L 665 655 L 655 725 L 600 705 Z",
-        "center": { "lat": 35.6051, "lng": 140.1233, "svgX": 635, "svgY": 685 }
-      }
+      "properties": { "code": "JP-12", "name": "지바현", "fullName": "지바현 (千葉県)", "regionName": "간토 지방", "centerLat": 35.604, "centerLng": 140.123, "svgCenter": [645, 660] },
+      "geometry": { "path": "M635,620 C655,615 675,630 680,655 C680,685 660,705 640,695 C625,675 625,645 635,620 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-13",
-        "name": "도쿄",
-        "fullName": "도쿄도",
-        "nameJa": "東京都",
-        "nameRomaji": "Tokyo",
-        "regionName": "간토 지방",
-        "path": "M 555 665 L 600 670 L 595 700 L 550 695 Z",
-        "center": { "lat": 35.6895, "lng": 139.6917, "svgX": 575, "svgY": 680 }
-      }
+      "properties": { "code": "JP-13", "name": "도쿄도", "fullName": "도쿄도 (東京都)", "regionName": "간토 지방", "centerLat": 35.689, "centerLng": 139.691, "svgCenter": [605, 650] },
+      "geometry": { "path": "M585,640 C605,635 620,640 625,655 C620,670 600,670 585,665 C575,655 575,645 585,640 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-14",
-        "name": "가나가와",
-        "fullName": "가나가와현",
-        "nameJa": "神奈川県",
-        "nameRomaji": "Kanagawa",
-        "regionName": "간토 지방",
-        "path": "M 535 690 L 585 695 L 575 735 L 525 725 Z",
-        "center": { "lat": 35.4475, "lng": 139.6423, "svgX": 555, "svgY": 710 }
-      }
+      "properties": { "code": "JP-14", "name": "가나가와현", "fullName": "가나가와현 (神奈川県)", "regionName": "간토 지방", "centerLat": 35.447, "centerLng": 139.642, "svgCenter": [595, 680] },
+      "geometry": { "path": "M580,665 C600,660 615,665 620,680 C615,700 595,705 575,695 C570,680 570,670 580,665 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-15",
-        "name": "니가타",
-        "fullName": "니가타현",
-        "nameJa": "新潟県",
-        "nameRomaji": "Niigata",
-        "regionName": "주부 지방",
-        "path": "M 520 495 L 590 515 L 565 585 L 495 565 Z",
-        "center": { "lat": 37.9024, "lng": 139.0232, "svgX": 545, "svgY": 540 }
-      }
+      "properties": { "code": "JP-15", "name": "니가타현", "fullName": "니가타현 (新潟県)", "regionName": "주부 지방", "centerLat": 37.902, "centerLng": 139.023, "svgCenter": [585, 490] },
+      "geometry": { "path": "M560,450 C590,440 620,460 625,490 C620,525 580,545 555,535 C540,510 540,475 560,450 Z M535,420 C545,410 560,425 550,440 C540,450 530,440 535,420 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-16",
-        "name": "도야마",
-        "fullName": "도야마현",
-        "nameJa": "富山県",
-        "nameRomaji": "Toyama",
-        "regionName": "주부 지방",
-        "path": "M 455 540 L 500 550 L 490 600 L 445 590 Z",
-        "center": { "lat": 36.6953, "lng": 137.2113, "svgX": 470, "svgY": 570 }
-      }
+      "properties": { "code": "JP-16", "name": "도야마현", "fullName": "도야마현 (富山県)", "regionName": "주부 지방", "centerLat": 36.695, "centerLng": 137.211, "svgCenter": [505, 535] },
+      "geometry": { "path": "M490,515 C515,510 530,525 530,550 C520,565 500,570 485,560 C480,540 480,525 490,515 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-17",
-        "name": "이시카와",
-        "fullName": "이시카와현",
-        "nameJa": "石川県",
-        "nameRomaji": "Ishikawa",
-        "regionName": "주부 지방",
-        "path": "M 430 510 L 465 520 L 450 585 L 415 575 Z",
-        "center": { "lat": 36.5947, "lng": 136.6256, "svgX": 445, "svgY": 550 }
-      }
+      "properties": { "code": "JP-17", "name": "이시카와현", "fullName": "이시카와현 (石川県)", "regionName": "주부 지방", "centerLat": 36.594, "centerLng": 136.625, "svgCenter": [480, 500] },
+      "geometry": { "path": "M475,445 C490,435 505,455 500,480 C490,505 475,540 460,535 C455,510 460,475 475,445 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-18",
-        "name": "후쿠이",
-        "fullName": "후쿠이현",
-        "nameJa": "福井県",
-        "nameRomaji": "Fukui",
-        "regionName": "주부 지방",
-        "path": "M 390 575 L 445 590 L 435 635 L 380 620 Z",
-        "center": { "lat": 36.0652, "lng": 136.2216, "svgX": 415, "svgY": 605 }
-      }
+      "properties": { "code": "JP-18", "name": "후쿠이현", "fullName": "후쿠이현 (福井県)", "regionName": "주부 지방", "centerLat": 36.065, "centerLng": 136.221, "svgCenter": [445, 575] },
+      "geometry": { "path": "M430,550 C455,545 470,560 465,585 C455,605 435,610 420,600 C415,580 420,560 430,550 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-19",
-        "name": "야마나시",
-        "fullName": "야마나시현",
-        "nameJa": "山梨県",
-        "nameRomaji": "Yamanashi",
-        "regionName": "주부 지방",
-        "path": "M 505 650 L 545 660 L 535 700 L 495 690 Z",
-        "center": { "lat": 35.6639, "lng": 138.5684, "svgX": 520, "svgY": 675 }
-      }
+      "properties": { "code": "JP-19", "name": "야마나시현", "fullName": "야마나시현 (山梨県)", "regionName": "주부 지방", "centerLat": 35.663, "centerLng": 138.568, "svgCenter": [555, 645] },
+      "geometry": { "path": "M540,625 C565,620 575,635 575,655 C570,675 550,680 535,670 C530,650 530,635 540,625 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-20",
-        "name": "나가노",
-        "fullName": "나가노현",
-        "nameJa": "長野県",
-        "nameRomaji": "Nagano",
-        "regionName": "주부 지방",
-        "path": "M 485 580 L 535 590 L 515 670 L 465 660 Z",
-        "center": { "lat": 36.6513, "lng": 138.1812, "svgX": 500, "svgY": 625 }
-      }
+      "properties": { "code": "JP-20", "name": "나가노현", "fullName": "나가노현 (長野県)", "regionName": "주부 지방", "centerLat": 36.651, "centerLng": 138.181, "svgCenter": [535, 590] },
+      "geometry": { "path": "M520,545 C550,540 565,565 565,605 C555,640 530,655 510,640 C495,610 500,565 520,545 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-21",
-        "name": "기후",
-        "fullName": "기후현",
-        "nameJa": "岐阜県",
-        "nameRomaji": "Gifu",
-        "regionName": "주부 지방",
-        "path": "M 435 600 L 485 610 L 465 680 L 415 670 Z",
-        "center": { "lat": 35.3912, "lng": 136.7223, "svgX": 450, "svgY": 640 }
-      }
+      "properties": { "code": "JP-21", "name": "기후현", "fullName": "기후현 (岐阜県)", "regionName": "주부 지방", "centerLat": 35.391, "centerLng": 136.722, "svgCenter": [475, 615] },
+      "geometry": { "path": "M460,575 C490,570 510,590 510,625 C500,660 470,670 450,655 C440,625 445,590 460,575 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-22",
-        "name": "시즈오카",
-        "fullName": "시즈오카현",
-        "nameJa": "静岡県",
-        "nameRomaji": "Shizuoka",
-        "regionName": "주부 지방",
-        "path": "M 485 690 L 550 700 L 535 755 L 470 745 Z",
-        "center": { "lat": 34.9769, "lng": 138.3831, "svgX": 510, "svgY": 720 }
-      }
+      "properties": { "code": "JP-22", "name": "시즈오카현", "fullName": "시즈오카현 (静岡県)", "regionName": "주부 지방", "centerLat": 34.976, "centerLng": 138.383, "svgCenter": [555, 695] },
+      "geometry": { "path": "M535,670 C570,665 595,685 585,715 C565,735 530,735 515,715 C510,695 520,680 535,670 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-23",
-        "name": "아이치",
-        "fullName": "아이치현",
-        "nameJa": "愛知県",
-        "nameRomaji": "Aichi",
-        "regionName": "주부 지방",
-        "path": "M 430 680 L 485 690 L 470 745 L 415 735 Z",
-        "center": { "lat": 35.1802, "lng": 136.9066, "svgX": 450, "svgY": 710 }
-      }
+      "properties": { "code": "JP-23", "name": "아이치현", "fullName": "아이치현 (愛知県)", "regionName": "주부 지방", "centerLat": 35.18, "centerLng": 136.906, "svgCenter": [485, 680] },
+      "geometry": { "path": "M465,655 C495,650 515,665 515,690 C505,715 480,725 460,710 C450,690 450,670 465,655 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-24",
-        "name": "미에",
-        "fullName": "미에현",
-        "nameJa": "三重県",
-        "nameRomaji": "Mie",
-        "regionName": "간사이 지방",
-        "path": "M 390 685 L 430 695 L 415 780 L 375 770 Z",
-        "center": { "lat": 34.7303, "lng": 136.5086, "svgX": 405, "svgY": 735 }
-      }
+      "properties": { "code": "JP-24", "name": "미에현", "fullName": "미에현 (三重県)", "regionName": "간사이 지방", "centerLat": 34.73, "centerLng": 136.508, "svgCenter": [440, 700] },
+      "geometry": { "path": "M430,660 C455,655 465,675 460,705 C450,740 425,750 415,730 C410,700 415,675 430,660 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-25",
-        "name": "시가",
-        "fullName": "시가현",
-        "nameJa": "滋賀県",
-        "nameRomaji": "Shiga",
-        "regionName": "간사이 지방",
-        "path": "M 380 630 L 425 640 L 410 685 L 365 675 Z",
-        "center": { "lat": 35.0045, "lng": 135.8686, "svgX": 395, "svgY": 655 }
-      }
+      "properties": { "code": "JP-25", "name": "시가현", "fullName": "시가현 (滋賀県)", "regionName": "간사이 지방", "centerLat": 35.004, "centerLng": 135.868, "svgCenter": [425, 635] },
+      "geometry": { "path": "M415,610 C440,605 450,625 445,650 C435,670 415,675 405,660 C400,640 405,620 415,610 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-26",
-        "name": "교토",
-        "fullName": "교토부",
-        "nameJa": "京都府",
-        "nameRomaji": "Kyoto",
-        "regionName": "간사이 지방",
-        "path": "M 335 605 L 385 615 L 370 675 L 320 665 Z",
-        "center": { "lat": 35.0211, "lng": 135.7556, "svgX": 355, "svgY": 640 }
-      }
+      "properties": { "code": "JP-26", "name": "교토부", "fullName": "교토부 (京都府)", "regionName": "간사이 지방", "centerLat": 35.021, "centerLng": 135.755, "svgCenter": [390, 615] },
+      "geometry": { "path": "M380,580 C405,570 420,590 415,620 C405,650 385,655 375,640 C365,615 370,590 380,580 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-27",
-        "name": "오사카",
-        "fullName": "오사카부",
-        "nameJa": "大阪府",
-        "nameRomaji": "Osaka",
-        "regionName": "간사이 지방",
-        "path": "M 335 675 L 375 680 L 365 725 L 325 720 Z",
-        "center": { "lat": 34.6937, "lng": 135.5023, "svgX": 350, "svgY": 700 }
-      }
+      "properties": { "code": "JP-27", "name": "오사카부", "fullName": "오사카부 (大阪府)", "regionName": "간사이 지방", "centerLat": 34.686, "centerLng": 135.52, "svgCenter": [380, 675] },
+      "geometry": { "path": "M370,650 C390,645 400,660 395,685 C385,705 370,705 365,690 C360,670 365,655 370,650 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-28",
-        "name": "효고",
-        "fullName": "효고현",
-        "nameJa": "兵庫県",
-        "nameRomaji": "Hyogo",
-        "regionName": "간사이 지방",
-        "path": "M 275 615 L 335 625 L 325 700 L 265 690 Z",
-        "center": { "lat": 34.6913, "lng": 135.1830, "svgX": 300, "svgY": 660 }
-      }
+      "properties": { "code": "JP-28", "name": "효고현", "fullName": "효고현 (兵庫県)", "regionName": "간사이 지방", "centerLat": 34.691, "centerLng": 135.183, "svgCenter": [345, 630] },
+      "geometry": { "path": "M330,590 C365,580 380,605 375,640 C365,675 335,680 320,660 C315,630 320,605 330,590 Z M330,680 C340,675 345,690 340,705 C335,715 325,710 325,695 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-29",
-        "name": "나라",
-        "fullName": "나라현",
-        "nameJa": "奈良県",
-        "nameRomaji": "Nara",
-        "regionName": "간사이 지방",
-        "path": "M 355 695 L 390 700 L 380 765 L 345 760 Z",
-        "center": { "lat": 34.6851, "lng": 135.8327, "svgX": 370, "svgY": 730 }
-      }
+      "properties": { "code": "JP-29", "name": "나라현", "fullName": "나라현 (奈良県)", "regionName": "간사이 지방", "centerLat": 34.685, "centerLng": 135.832, "svgCenter": [400, 690] },
+      "geometry": { "path": "M390,665 C410,660 420,675 415,705 C405,730 390,735 385,715 C380,690 385,675 390,665 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-30",
-        "name": "와카야마",
-        "fullName": "와카야마현",
-        "nameJa": "和歌山県",
-        "nameRomaji": "Wakayama",
-        "regionName": "간사이 지방",
-        "path": "M 320 735 L 375 745 L 360 815 L 305 805 Z",
-        "center": { "lat": 34.2260, "lng": 135.1675, "svgX": 340, "svgY": 775 }
-      }
+      "properties": { "code": "JP-30", "name": "와카야마현", "fullName": "와카야마현 (和歌山県)", "regionName": "간사이 지방", "centerLat": 34.226, "centerLng": 135.167, "svgCenter": [380, 745] },
+      "geometry": { "path": "M365,710 C395,705 410,725 405,760 C395,785 365,785 355,765 C350,740 355,720 365,710 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-31",
-        "name": "돗토리",
-        "fullName": "돗토리현",
-        "nameJa": "鳥取県",
-        "nameRomaji": "Tottori",
-        "regionName": "주고쿠 지방",
-        "path": "M 215 625 L 275 635 L 265 675 L 205 665 Z",
-        "center": { "lat": 35.5036, "lng": 134.2383, "svgX": 240, "svgY": 650 }
-      }
+      "properties": { "code": "JP-31", "name": "돗토리현", "fullName": "돗토리현 (鳥取県)", "regionName": "주고쿠 지방", "centerLat": 35.503, "centerLng": 134.238, "svgCenter": [290, 605] },
+      "geometry": { "path": "M265,595 C305,585 325,600 320,620 C305,635 270,635 255,620 C250,605 255,600 265,595 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-32",
-        "name": "시마네",
-        "fullName": "시마네현",
-        "nameJa": "島根県",
-        "nameRomaji": "Shimane",
-        "regionName": "주고쿠 지방",
-        "path": "M 140 645 L 215 655 L 205 700 L 130 690 Z",
-        "center": { "lat": 35.4723, "lng": 133.0505, "svgX": 175, "svgY": 670 }
-      }
+      "properties": { "code": "JP-32", "name": "시마네현", "fullName": "시마네현 (島根県)", "regionName": "주고쿠 지방", "centerLat": 35.472, "centerLng": 133.05, "svgCenter": [215, 620] },
+      "geometry": { "path": "M180,615 C230,595 260,610 255,635 C235,655 185,660 170,645 C165,630 170,620 180,615 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-33",
-        "name": "오카야마",
-        "fullName": "오카야마현",
-        "nameJa": "岡山県",
-        "nameRomaji": "Okayama",
-        "regionName": "주고쿠 지방",
-        "path": "M 215 675 L 270 685 L 260 730 L 205 720 Z",
-        "center": { "lat": 34.6618, "lng": 133.9344, "svgX": 240, "svgY": 705 }
-      }
+      "properties": { "code": "JP-33", "name": "오카야마현", "fullName": "오카야마현 (岡山県)", "regionName": "주고쿠 지방", "centerLat": 34.661, "centerLng": 133.935, "svgCenter": [280, 655] },
+      "geometry": { "path": "M260,630 C295,625 315,640 310,670 C295,690 265,690 255,675 C250,655 250,640 260,630 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-34",
-        "name": "히로시마",
-        "fullName": "히로시마현",
-        "nameJa": "広島県",
-        "nameRomaji": "Hiroshima",
-        "regionName": "주고쿠 지방",
-        "path": "M 145 690 L 210 700 L 195 750 L 130 740 Z",
-        "center": { "lat": 34.3963, "lng": 132.4594, "svgX": 170, "svgY": 720 }
-      }
+      "properties": { "code": "JP-34", "name": "히로시마현", "fullName": "히로시마현 (広島県)", "regionName": "주고쿠 지방", "centerLat": 34.396, "centerLng": 132.459, "svgCenter": [210, 665] },
+      "geometry": { "path": "M185,640 C230,630 255,650 250,685 C230,710 185,710 175,690 C170,665 175,650 185,640 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-35",
-        "name": "야마구치",
-        "fullName": "야마구치현",
-        "nameJa": "山口県",
-        "nameRomaji": "Yamaguchi",
-        "regionName": "주고쿠 지방",
-        "path": "M 75 705 L 140 715 L 125 765 L 60 755 Z",
-        "center": { "lat": 34.1858, "lng": 131.4705, "svgX": 100, "svgY": 735 }
-      }
+      "properties": { "code": "JP-35", "name": "야마구치현", "fullName": "야마구치현 (山口県)", "regionName": "주고쿠 지방", "centerLat": 34.186, "centerLng": 131.471, "svgCenter": [130, 675] },
+      "geometry": { "path": "M105,655 C145,640 175,660 170,695 C150,725 110,725 95,705 C90,680 95,665 105,655 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-36",
-        "name": "도쿠시마",
-        "fullName": "도쿠시마현",
-        "nameJa": "徳島県",
-        "nameRomaji": "Tokushima",
-        "regionName": "시코쿠 지방",
-        "path": "M 245 755 L 295 765 L 285 815 L 235 805 Z",
-        "center": { "lat": 34.0658, "lng": 134.5594, "svgX": 265, "svgY": 785 }
-      }
+      "properties": { "code": "JP-36", "name": "도쿠시마현", "fullName": "도쿠시마현 (徳島県)", "regionName": "시코쿠 지방", "centerLat": 34.065, "centerLng": 134.559, "svgCenter": [290, 735] },
+      "geometry": { "path": "M270,715 C305,710 320,730 315,755 C300,775 270,775 260,755 C255,735 260,720 270,715 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-37",
-        "name": "가가와",
-        "fullName": "가가와현",
-        "nameJa": "香川県",
-        "nameRomaji": "Kagawa",
-        "regionName": "시코쿠 지방",
-        "path": "M 215 735 L 270 745 L 260 775 L 205 765 Z",
-        "center": { "lat": 34.3401, "lng": 134.0434, "svgX": 240, "svgY": 755 }
-      }
+      "properties": { "code": "JP-37", "name": "가가와현", "fullName": "가가와현 (香川県)", "regionName": "시코쿠 지방", "centerLat": 34.34, "centerLng": 134.043, "svgCenter": [270, 695] },
+      "geometry": { "path": "M245,685 C285,680 305,695 300,715 C285,730 250,730 240,715 C235,700 240,690 245,685 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-38",
-        "name": "에히메",
-        "fullName": "에히메현",
-        "nameJa": "愛媛県",
-        "nameRomaji": "Ehime",
-        "regionName": "시코쿠 지방",
-        "path": "M 150 750 L 210 760 L 195 820 L 135 810 Z",
-        "center": { "lat": 33.8417, "lng": 132.7661, "svgX": 175, "svgY": 785 }
-      }
+      "properties": { "code": "JP-38", "name": "에히메현", "fullName": "에히메현 (愛媛県)", "regionName": "시코쿠 지방", "centerLat": 33.841, "centerLng": 132.766, "svgCenter": [205, 735] },
+      "geometry": { "path": "M175,710 C225,695 250,720 245,755 C225,785 180,785 165,760 C160,735 165,720 175,710 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-39",
-        "name": "고치",
-        "fullName": "고치현",
-        "nameJa": "高知県",
-        "nameRomaji": "Kochi",
-        "regionName": "시코쿠 지방",
-        "path": "M 180 805 L 250 815 L 235 865 L 165 855 Z",
-        "center": { "lat": 33.5597, "lng": 133.5311, "svgX": 210, "svgY": 835 }
-      }
+      "properties": { "code": "JP-39", "name": "고치현", "fullName": "고치현 (高知県)", "regionName": "시코쿠 지방", "centerLat": 33.559, "centerLng": 133.531, "svgCenter": [235, 775] },
+      "geometry": { "path": "M195,755 C250,740 285,760 280,795 C255,825 200,825 185,800 C180,775 185,765 195,755 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-40",
-        "name": "후쿠오카",
-        "fullName": "후쿠오카현",
-        "nameJa": "福岡県",
-        "nameRomaji": "Fukuoka",
-        "regionName": "규슈 지방",
-        "path": "M 50 775 L 105 785 L 95 835 L 40 825 Z",
-        "center": { "lat": 33.5904, "lng": 130.4017, "svgX": 75, "svgY": 805 }
-      }
+      "properties": { "code": "JP-40", "name": "후쿠오카현", "fullName": "후쿠오카현 (福岡県)", "regionName": "규슈 지방", "centerLat": 33.606, "centerLng": 130.418, "svgCenter": [65, 765] },
+      "geometry": { "path": "M45,735 C75,720 100,740 95,775 C85,805 50,810 35,790 C30,765 35,745 45,735 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-41",
-        "name": "사가",
-        "fullName": "사가현",
-        "nameJa": "佐賀県",
-        "nameRomaji": "Saga",
-        "regionName": "규슈 지방",
-        "path": "M 20 800 L 60 805 L 50 845 L 10 840 Z",
-        "center": { "lat": 33.2494, "lng": 130.2988, "svgX": 35, "svgY": 825 }
-      }
+      "properties": { "code": "JP-41", "name": "사가현", "fullName": "사가현 (佐賀県)", "regionName": "규슈 지방", "centerLat": 33.249, "centerLng": 130.298, "svgCenter": [25, 775] },
+      "geometry": { "path": "M10,755 C35,750 50,765 45,790 C35,810 15,810 5,795 C0,775 5,760 10,755 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-42",
-        "name": "나가사키",
-        "fullName": "나가사키현",
-        "nameJa": "長崎県",
-        "nameRomaji": "Nagasaki",
-        "regionName": "규슈 지방",
-        "path": "M 5 835 L 40 840 L 30 890 L -5 885 Z",
-        "center": { "lat": 32.7448, "lng": 129.8737, "svgX": 20, "svgY": 865 }
-      }
+      "properties": { "code": "JP-42", "name": "나가사키현", "fullName": "나가사키현 (長崎県)", "regionName": "규슈 지방", "centerLat": 32.744, "centerLng": 129.873, "svgCenter": [-15, 805] },
+      "geometry": { "path": "M-30,780 C0,770 15,790 10,815 C0,845 -25,845 -35,825 C-40,800 -35,785 -30,780 Z M-50,740 C-40,735 -35,745 -40,760 C-45,770 -55,765 -55,750 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-43",
-        "name": "구마모토",
-        "fullName": "구마모토현",
-        "nameJa": "熊本県",
-        "nameRomaji": "Kumamoto",
-        "regionName": "규슈 지방",
-        "path": "M 40 845 L 90 855 L 75 915 L 25 905 Z",
-        "center": { "lat": 32.7898, "lng": 130.7417, "svgX": 60, "svgY": 880 }
-      }
+      "properties": { "code": "JP-43", "name": "구마모토현", "fullName": "구마모토현 (熊本県)", "regionName": "규슈 지방", "centerLat": 32.789, "centerLng": 130.741, "svgCenter": [45, 825] },
+      "geometry": { "path": "M25,795 C65,790 85,810 80,845 C65,875 30,880 15,855 C10,830 15,805 25,795 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-44",
-        "name": "오이타",
-        "fullName": "오이타현",
-        "nameJa": "大分県",
-        "nameRomaji": "Oita",
-        "regionName": "규슈 지방",
-        "path": "M 95 805 L 145 815 L 135 870 L 85 860 Z",
-        "center": { "lat": 33.2382, "lng": 131.6126, "svgX": 115, "svgY": 840 }
-      }
+      "properties": { "code": "JP-44", "name": "오이타현", "fullName": "오이타현 (大分県)", "regionName": "규슈 지방", "centerLat": 33.238, "centerLng": 131.612, "svgCenter": [95, 795] },
+      "geometry": { "path": "M75,765 C115,755 135,780 125,815 C110,845 75,845 65,825 C60,795 65,775 75,765 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-45",
-        "name": "미야자키",
-        "fullName": "미야자키현",
-        "nameJa": "宮崎県",
-        "nameRomaji": "Miyazaki",
-        "regionName": "규슈 지방",
-        "path": "M 75 880 L 130 890 L 115 955 L 60 945 Z",
-        "center": { "lat": 31.9111, "lng": 131.4239, "svgX": 95, "svgY": 920 }
-      }
+      "properties": { "code": "JP-45", "name": "미야자키현", "fullName": "미야자키현 (宮崎県)", "regionName": "규슈 지방", "centerLat": 31.911, "centerLng": 131.423, "svgCenter": [75, 875] },
+      "geometry": { "path": "M55,835 C90,830 105,855 100,895 C85,930 55,930 45,905 C40,870 45,845 55,835 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-46",
-        "name": "가고시마",
-        "fullName": "가고시마현",
-        "nameJa": "鹿児島県",
-        "nameRomaji": "Kagoshima",
-        "regionName": "규슈 지방",
-        "path": "M 20 915 L 75 925 L 60 990 L 5 980 Z",
-        "center": { "lat": 31.5602, "lng": 130.5581, "svgX": 40, "svgY": 955 }
-      }
+      "properties": { "code": "JP-46", "name": "가고시마현", "fullName": "가고시마현 (鹿児島県)", "regionName": "규슈 지방", "centerLat": 31.56, "centerLng": 130.558, "svgCenter": [20, 895] },
+      "geometry": { "path": "M0,860 C40,850 65,875 55,915 C40,955 5,955 -10,925 C-15,890 -5,870 0,860 Z" }
     },
     {
       "type": "Feature",
-      "properties": {
-        "code": "JP-47",
-        "name": "오키나와",
-        "fullName": "오키나와현",
-        "nameJa": "沖縄県",
-        "nameRomaji": "Okinawa",
-        "regionName": "규슈 지방",
-        "path": "M 220 930 L 280 920 L 290 950 L 230 960 Z",
-        "center": { "lat": 26.2124, "lng": 127.6809, "svgX": 255, "svgY": 940 }
-      }
+      "properties": { "code": "JP-47", "name": "오키나와현", "fullName": "오키나와현 (沖縄県)", "regionName": "규슈 지방", "centerLat": 26.212, "centerLng": 127.681, "svgCenter": [-130, 930] },
+      "geometry": { "path": "M-145,915 C-125,905 -110,920 -115,935 C-125,950 -145,950 -155,935 C-160,925 -155,915 -145,915 Z" }
     }
   ]
 }

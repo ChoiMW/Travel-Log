@@ -6,8 +6,9 @@ import {
 import japanData from '../../data/japanPrefectures.json';
 import { JapanPrefectureProperties, Trip, VisitedDistrictSummary, PhotoItem, DistrictFeatureProperties } from '../../types/travel';
 import { japanRegions, searchJapanPrefectures } from '../../utils/japanGeoMatcher';
+import { GoogleMapsPilotViewer } from './GoogleMapsPilotViewer';
 
-const features = japanData.features as unknown as { type: string; properties: JapanPrefectureProperties }[];
+const features = (japanData.features as unknown) as { type: string; properties: JapanPrefectureProperties; geometry: { path: string } }[];
 
 interface JapanMapViewerProps {
   trips: Trip[];
@@ -56,6 +57,7 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
   onSelectTrip,
   onNewTripForDistrict,
 }) => {
+  const [viewMode, setViewMode] = useState<'vector' | 'google'>('vector');
   const [selectedRegion, setSelectedRegion] = useState<string>('전체 (47개 도도부현)');
   const [selectedPrefCode, setSelectedPrefCode] = useState<string | null>(null);
   const [hoveredPref, setHoveredPref] = useState<JapanPrefectureProperties | null>(null);
@@ -305,22 +307,83 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
 
   return (
     <div className="map-viewer-container" ref={containerRef}>
-      {/* 좌측: 메인 일본 지도 캔버스 */}
-      <div className="map-main-canvas">
-        {/* 상단 툴바 */}
-        <div className="map-toolbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
-            <select
-              className="map-sdo-select"
-              value={selectedRegion}
-              onChange={e => handleRegionChange(e.target.value)}
-            >
-              {japanRegions.map(reg => (
-                <option key={reg} value={reg}>
-                  {reg}
-                </option>
-              ))}
-            </select>
+      {/* 1. 최상단 뷰 모드 스위처 (정밀 벡터 지도 ↔ 구글 맵스 라이브) */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            background: 'var(--bg-surface)',
+            padding: '4px',
+            borderRadius: '9999px',
+            boxShadow: 'var(--shadow-sm)',
+            border: '1px solid var(--border-light)',
+            gap: '4px',
+          }}
+        >
+          <button
+            onClick={() => setViewMode('vector')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              border: 'none',
+              background: viewMode === 'vector' ? '#f43f5e' : 'transparent',
+              color: viewMode === 'vector' ? 'white' : 'var(--text-muted)',
+              fontSize: '0.86rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>🗾</span>
+            <span>정밀 벡터 정복 지도</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode('google')}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              border: 'none',
+              background: viewMode === 'google' ? '#4285F4' : 'transparent',
+              color: viewMode === 'google' ? 'white' : 'var(--text-muted)',
+              fontSize: '0.86rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>🌐</span>
+            <span>Google Maps 라이브 (파일럿)</span>
+          </button>
+        </div>
+      </div>
+
+      {viewMode === 'google' ? (
+        <GoogleMapsPilotViewer initialPrefCode={selectedPrefCode || 'JP-40'} />
+      ) : (
+        <>
+          {/* 좌측: 메인 일본 지도 캔버스 */}
+          <div className="map-main-canvas">
+            {/* 상단 툴바 */}
+            <div className="map-toolbar">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
+                <select
+                  className="map-sdo-select"
+                  value={selectedRegion}
+                  onChange={e => handleRegionChange(e.target.value)}
+                >
+                  {japanRegions.map(reg => (
+                    <option key={reg} value={reg}>
+                      {reg}
+                    </option>
+                  ))}
+                </select>
 
             {/* 일본 도도부현 검색창 */}
             <div style={{ position: 'relative' }}>
@@ -504,7 +567,7 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
                 return (
                   <path
                     key={props.code}
-                    d={props.path}
+                    d={props.path || feature.geometry.path}
                     className={`district-path ${isVisited ? 'visited' : ''} ${isSelected ? 'selected' : ''}`}
                     style={{
                       fill: fillColor,
@@ -576,7 +639,9 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
               <g className="district-labels" style={{ pointerEvents: 'none' }}>
                 {features.map(feature => {
                   const props = feature.properties;
-                  if (!props.center || !props.center.svgX || !props.center.svgY) return null;
+                  const posX = props.svgCenter ? props.svgCenter[0] : (props.center?.svgX || 0);
+                  const posY = props.svgCenter ? props.svgCenter[1] : (props.center?.svgY || 0);
+                  if (!posX || !posY) return null;
                   if (selectedRegion !== '전체 (47개 도도부현)' && props.regionName !== selectedRegion) return null;
 
                   const isVisited = visitedSummaryMap.has(props.code);
@@ -585,8 +650,8 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
                   return (
                     <text
                       key={`lbl_${props.code}`}
-                      x={props.center.svgX}
-                      y={props.center.svgY}
+                      x={posX}
+                      y={posY}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       style={{
@@ -917,6 +982,8 @@ export const JapanMapViewer: React.FC<JapanMapViewerProps> = ({
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

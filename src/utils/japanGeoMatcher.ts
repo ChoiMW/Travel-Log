@@ -1,7 +1,25 @@
 import japanData from '../data/japanPrefectures.json';
 import { JapanPrefectureProperties } from '../types/travel';
 
-export const japanPrefectures = japanData.features.map(f => f.properties) as JapanPrefectureProperties[];
+export const japanPrefectures = (japanData.features.map(f => {
+  const p = f.properties;
+  return {
+    code: p.code,
+    name: p.name,
+    fullName: p.fullName,
+    regionName: p.regionName,
+    centerLat: p.centerLat,
+    centerLng: p.centerLng,
+    svgCenter: p.svgCenter as [number, number],
+    path: f.geometry.path,
+    center: {
+      lat: p.centerLat,
+      lng: p.centerLng,
+      svgX: p.svgCenter[0],
+      svgY: p.svgCenter[1],
+    },
+  };
+}) as unknown) as JapanPrefectureProperties[];
 
 export const japanRegions: string[] = [
   '전체 (47개 도도부현)',
@@ -28,8 +46,10 @@ export function findJapanPrefectureByCoordinates(lat: number, lng: number): Japa
   let minDistance = Infinity;
 
   for (const pref of japanPrefectures) {
-    const dLat = pref.center.lat - lat;
-    const dLng = pref.center.lng - lng;
+    const pLat = pref.centerLat || pref.center?.lat || 0;
+    const pLng = pref.centerLng || pref.center?.lng || 0;
+    const dLat = pLat - lat;
+    const dLng = pLng - lng;
     const dist = dLat * dLat + dLng * dLng;
 
     if (dist < minDistance) {
@@ -58,8 +78,8 @@ export function searchJapanPrefectures(query: string): JapanPrefectureProperties
     return (
       pref.name.toLowerCase().includes(clean) ||
       pref.fullName.toLowerCase().includes(clean) ||
-      pref.nameJa.includes(clean) ||
-      pref.nameRomaji.toLowerCase().includes(clean) ||
+      (pref.nameJa && pref.nameJa.toLowerCase().includes(clean)) ||
+      (pref.nameRomaji && pref.nameRomaji.toLowerCase().includes(clean)) ||
       pref.regionName.toLowerCase().includes(clean)
     );
   });
