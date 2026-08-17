@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Navigation, NavTab } from './components/Layout/Navigation';
 import { TossHomeView } from './components/Themes/Toss/TossHomeView';
 import { MapViewer } from './components/Map/MapViewer';
+import { JapanMapViewer } from './components/Map/JapanMapViewer';
 import { TripTimeline } from './components/Diary/TripTimeline';
 import { TripDetailModal } from './components/Diary/TripDetailModal';
 import { TripEditorModal } from './components/Editor/TripEditorModal';
@@ -12,7 +13,7 @@ import { SettingsModal } from './components/Settings/SettingsModal';
 import { TravelPocketView } from './components/Pocket/TravelPocketView';
 
 import { getAllTrips, getAllPhotos, saveTrip, savePhotos, deleteTrip } from './db';
-import { Trip, PhotoItem, VisitedDistrictSummary, DistrictFeatureProperties } from './types/travel';
+import { Trip, PhotoItem, VisitedDistrictSummary, DistrictFeatureProperties, CountryCode } from './types/travel';
 import { ParsedPhotoResult } from './utils/exif';
 import { matchActiveTrip, ActiveTripMatchResult } from './utils/tripMatcher';
 import districtsData from './data/koreaDistricts.json';
@@ -20,13 +21,12 @@ import { MapPin, Calendar, Sparkles, ArrowRight, X } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>('KR');
   const [trips, setTrips] = useState<Trip[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // ==========================================
-  // [신규] 실시간 위치 및 오늘 날짜 기반 자동 매칭 상태
-  // ==========================================
+  // 실시간 위치 및 오늘 날짜 기반 자동 매칭 상태
   const [activeMatchResult, setActiveMatchResult] = useState<ActiveTripMatchResult | null>(null);
   const [isMatchBannerDismissed, setIsMatchBannerDismissed] = useState<boolean>(false);
 
@@ -65,7 +65,7 @@ export const App: React.FC = () => {
       setTrips(loadedTrips);
       setPhotos(loadedPhotos);
 
-      // 위치 & 날짜 기반 여행 자동 매칭 실행
+      // 위치 & 날짜 기반 엄격 여행 자동 매칭 실행
       if (loadedTrips.length > 0) {
         const result = await matchActiveTrip(loadedTrips);
         if (result.matchedTrip) {
@@ -83,11 +83,21 @@ export const App: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // 방문한 시군구 요약 맵
+  // 국가별 여행/사진 필터링
+  const currentCountryTrips = useMemo(() => {
+    return trips.filter(t => selectedCountry === 'JP' ? t.country === 'JP' : t.country !== 'JP');
+  }, [trips, selectedCountry]);
+
+  const currentCountryPhotos = useMemo(() => {
+    const tripIds = new Set(currentCountryTrips.map(t => t.id));
+    return photos.filter(p => tripIds.has(p.tripId));
+  }, [photos, currentCountryTrips]);
+
+  // 방문한 지역 요약 맵 (선택된 국가 기준)
   const visitedSummaryMap = useMemo(() => {
     const map = new Map<string, VisitedDistrictSummary>();
 
-    trips.forEach(trip => {
+    currentCountryTrips.forEach(trip => {
       trip.districtCodes.forEach((code, idx) => {
         const fullName = trip.districtNames?.[idx] || code;
         const sdoName = fullName.split(' ')[0] || '';
@@ -111,7 +121,7 @@ export const App: React.FC = () => {
             visitCount: 1,
             latestVisitDate: trip.startDate,
             latestTripTitle: trip.title,
-            color: trip.color || '#3b82f6',
+            color: trip.color || (selectedCountry === 'JP' ? '#f43f5e' : '#3b82f6'),
             photoCount: 0,
             tripIds: [trip.id],
           });
@@ -119,7 +129,7 @@ export const App: React.FC = () => {
       });
     });
 
-    photos.forEach(p => {
+    currentCountryPhotos.forEach(p => {
       if (p.districtCode && map.has(p.districtCode)) {
         const item = map.get(p.districtCode)!;
         item.photoCount += 1;
@@ -127,9 +137,9 @@ export const App: React.FC = () => {
     });
 
     return map;
-  }, [trips, photos]);
+  }, [currentCountryTrips, currentCountryPhotos, selectedCountry]);
 
-  const totalDistrictsCount = districtsData.features.length;
+  const totalDistrictsCount = selectedCountry === 'JP' ? 47 : districtsData.features.length;
 
   const handleOpenNewTrip = (district?: DistrictFeatureProperties) => {
     setEditingTrip(null);
@@ -164,6 +174,7 @@ export const App: React.FC = () => {
         return {
           id: p.id || `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           tripId: tripData.id,
+          country: tripData.country || 'KR',
           districtCode,
           districtName,
           fileName: p.file.name,
@@ -184,9 +195,12 @@ export const App: React.FC = () => {
     await loadData();
   };
 
-  const handleUpdateTripFromPocket = async (updatedTrip: Trip) => {
+  const handleUpdateTrip = async (updatedTrip: Trip) => {
     await saveTrip(updatedTrip);
     setTrips(prev => prev.map(t => t.id === updatedTrip.id ? updatedTrip : t));
+    if (selectedTripForDetail && selectedTripForDetail.id === updatedTrip.id) {
+      setSelectedTripForDetail(updatedTrip);
+    }
   };
 
   const handleDeleteTrip = async (tripId: string) => {
@@ -197,6 +211,9 @@ export const App: React.FC = () => {
   // 자동 매칭 배너 클릭 시 여행 포켓으로 이동
   const handleGoToMatchedTrip = () => {
     if (activeMatchResult?.matchedTrip) {
+      if (activeMatchResult.matchedTrip.country) {
+        setSelectedCountry(activeMatchResult.matchedTrip.country);
+      }
       setCurrentTab('pocket');
     }
   };
@@ -207,6 +224,8 @@ export const App: React.FC = () => {
       <Navigation
         currentTab={currentTab}
         onTabChange={setCurrentTab}
+        selectedCountry={selectedCountry}
+        onCountryChange={setSelectedCountry}
         onNewTrip={() => handleOpenNewTrip()}
         visitedCount={visitedSummaryMap.size}
         totalCount={totalDistrictsCount}
@@ -246,12 +265,13 @@ export const App: React.FC = () => {
                   width: '42px',
                   height: '42px',
                   borderRadius: '12px',
-                  background: '#3182f6',
+                  background: selectedCountry === 'JP' ? '#f43f5e' : '#3182f6',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '1.2rem',
                   flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(49, 130, 246, 0.4)',
                 }}
               >
                 📍
@@ -268,9 +288,9 @@ export const App: React.FC = () => {
                   )}
                 </div>
 
-                <div style={{ fontSize: '0.98rem', fontWeight: 900, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.98rem', fontWeight: 800, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {activeMatchResult.matchedTrip.title}
-                  <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#94a3b8', marginLeft: '8px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>
                     ({activeMatchResult.matchedTrip.startDate} ~ {activeMatchResult.matchedTrip.endDate})
                   </span>
                 </div>
@@ -286,13 +306,13 @@ export const App: React.FC = () => {
                   border: 'none',
                   borderRadius: '12px',
                   padding: '8px 16px',
-                  fontSize: '0.86rem',
+                  fontSize: '0.84rem',
                   fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  transition: 'background 0.15s ease',
+                  boxShadow: '0 4px 14px rgba(49, 130, 246, 0.4)',
                 }}
               >
                 <span>일정/QR 보기</span>
@@ -302,13 +322,18 @@ export const App: React.FC = () => {
               <button
                 onClick={() => setIsMatchBannerDismissed(true)}
                 style={{
-                  background: 'rgba(255,255,255,0.1)',
+                  background: 'rgba(255, 255, 255, 0.1)',
                   border: 'none',
-                  color: '#94a3b8',
                   borderRadius: '10px',
-                  padding: '6px',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#94a3b8',
                   cursor: 'pointer',
                 }}
+                title="배너 닫기"
               >
                 <X size={16} />
               </button>
@@ -317,120 +342,130 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* 메인 뷰 컨텐츠 */}
-      <main className="main-content">
-        {/* 1. 홈 화면 (토스 원페이지 슈퍼앱) */}
-        {currentTab === 'home' && (
-          <TossHomeView
-            trips={trips}
-            photos={photos}
-            visitedSummaryMap={visitedSummaryMap}
-            totalDistrictsCount={totalDistrictsCount}
-            onSelectTrip={handleSelectTrip}
-            onNewTrip={() => handleOpenNewTrip()}
-            onSelectDistrict={handleOpenNewTrip}
-            onOpenPhoto={handleOpenPhoto}
-          />
-        )}
+      {/* Main Content */}
+      <main className="app-main">
+        {isLoading ? (
+          <div className="loading-state">
+            <div className="loading-spinner" />
+            <p>여행 기록을 불러오는 중입니다...</p>
+          </div>
+        ) : (
+          <>
+            {currentTab === 'home' && (
+              <TossHomeView
+                trips={currentCountryTrips}
+                photos={currentCountryPhotos}
+                visitedSummaryMap={visitedSummaryMap}
+                totalDistrictsCount={totalDistrictsCount}
+                onSelectTrip={handleSelectTrip}
+                onNewTrip={() => handleOpenNewTrip()}
+                onSelectDistrict={handleOpenNewTrip}
+                onOpenPhoto={handleOpenPhoto}
+              />
+            )}
 
-        {/* 2. 전국 여행 지도 */}
-        {currentTab === 'map' && (
-          <MapViewer
-            trips={trips}
-            photos={photos}
-            visitedSummaryMap={visitedSummaryMap}
-            onSelectTrip={handleSelectTrip}
-            onNewTripForDistrict={handleOpenNewTrip}
-          />
-        )}
+            {currentTab === 'map' && (
+              selectedCountry === 'JP' ? (
+                <JapanMapViewer
+                  trips={currentCountryTrips}
+                  photos={currentCountryPhotos}
+                  visitedSummaryMap={visitedSummaryMap}
+                  onSelectTrip={handleSelectTrip}
+                  onNewTripForDistrict={handleOpenNewTrip}
+                />
+              ) : (
+                <MapViewer
+                  trips={currentCountryTrips}
+                  photos={currentCountryPhotos}
+                  visitedSummaryMap={visitedSummaryMap}
+                  onSelectTrip={handleSelectTrip}
+                  onNewTripForDistrict={handleOpenNewTrip}
+                />
+              )
+            )}
 
-        {/* 3. 여행 기록 타임라인 */}
-        {currentTab === 'timeline' && (
-          <TripTimeline
-            trips={trips}
-            photos={photos}
-            onSelectTrip={handleSelectTrip}
-            onNewTrip={() => handleOpenNewTrip()}
-          />
-        )}
+            {currentTab === 'timeline' && (
+              <TripTimeline
+                trips={currentCountryTrips}
+                photos={currentCountryPhotos}
+                onSelectTrip={handleSelectTrip}
+                onNewTrip={() => handleOpenNewTrip()}
+              />
+            )}
 
-        {/* 4. 사진첩 갤러리 */}
-        {currentTab === 'photos' && (
-          <PhotoGallery
-            photos={photos}
-            trips={trips}
-            onPhotoClick={handleOpenPhoto}
-          />
-        )}
+            {currentTab === 'photos' && (
+              <PhotoGallery
+                photos={currentCountryPhotos}
+                trips={currentCountryTrips}
+                onPhotoClick={handleOpenPhoto}
+              />
+            )}
 
-        {/* 5. 스마트 여행 포켓 (자동 매칭된 여행 ID 자동 바인딩) */}
-        {currentTab === 'pocket' && (
-          <TravelPocketView
-            trips={trips}
-            defaultTripId={activeMatchResult?.matchedTrip?.id}
-            onUpdateTrip={handleUpdateTripFromPocket}
-            onOpenNewTripPlan={() => handleOpenNewTrip()}
-          />
-        )}
+            {currentTab === 'pocket' && (
+              <TravelPocketView
+                trips={currentCountryTrips}
+                defaultTripId={activeMatchResult?.matchedTrip?.id}
+                onUpdateTrip={handleUpdateTrip}
+                onOpenNewTripPlan={() => handleOpenNewTrip()}
+              />
+            )}
 
-        {/* 6. 전국 정복 통계 대시보드 */}
-        {currentTab === 'stats' && (
-          <StatsDashboard
-            trips={trips}
-            photos={photos}
-            visitedSummaryMap={visitedSummaryMap}
-          />
-        )}
-
-        {/* 7. 백업 및 설정 */}
-        {currentTab === 'settings' && (
-          <SettingsModal
-            isOpen={true}
-            onClose={() => setCurrentTab('home')}
-            onDataChanged={loadData}
-          />
+            {currentTab === 'stats' && (
+              <StatsDashboard
+                trips={currentCountryTrips}
+                photos={currentCountryPhotos}
+                visitedSummaryMap={visitedSummaryMap}
+              />
+            )}
+          </>
         )}
       </main>
 
-      {/* 여행 작성 / 수정 모달 */}
+      {/* 여행 작성/수정 모달 */}
       <TripEditorModal
         isOpen={isEditorOpen}
-        onClose={() => {
-          setIsEditorOpen(false);
-          setEditingTrip(null);
-          setInitialDistrictForTrip(null);
-        }}
+        onClose={() => setIsEditorOpen(false)}
         onSave={handleSaveTrip}
         editingTrip={editingTrip}
         initialDistrict={initialDistrictForTrip}
+        defaultCountry={selectedCountry}
       />
 
       {/* 여행 상세 모달 */}
-      <TripDetailModal
-        trip={selectedTripForDetail}
-        photos={photos}
-        isOpen={isDetailOpen}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedTripForDetail(null);
-        }}
-        onEdit={handleOpenEditTrip}
-        onDelete={handleDeleteTrip}
-        onPhotoClick={handleOpenPhoto}
-      />
+      {selectedTripForDetail && (
+        <TripDetailModal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          trip={selectedTripForDetail}
+          photos={photos.filter(p => p.tripId === selectedTripForDetail.id)}
+          onEdit={() => {
+            setIsDetailOpen(false);
+            handleOpenEditTrip(selectedTripForDetail);
+          }}
+          onDelete={() => {
+            setIsDetailOpen(false);
+            handleDeleteTrip(selectedTripForDetail.id);
+          }}
+          onPhotoClick={handleOpenPhoto}
+        />
+      )}
 
-      {/* 사진 라이트박스 */}
-      <PhotoLightbox
-        photo={selectedPhotoForLightbox}
-        trip={trips.find(t => t.id === selectedPhotoForLightbox?.tripId)}
-        isOpen={isLightboxOpen}
-        onClose={() => {
-          setIsLightboxOpen(false);
-          setSelectedPhotoForLightbox(null);
-        }}
+      {/* 고화질 사진 라이트박스 모달 */}
+      {selectedPhotoForLightbox && (
+        <PhotoLightbox
+          isOpen={isLightboxOpen}
+          onClose={() => setIsLightboxOpen(false)}
+          photo={selectedPhotoForLightbox}
+        />
+      )}
+
+      {/* 백업 및 설정 모달 */}
+      <SettingsModal
+        isOpen={currentTab === 'settings'}
+        onClose={() => setCurrentTab('home')}
+        onDataChanged={loadData}
       />
     </div>
   );
 };
-
 export default App;

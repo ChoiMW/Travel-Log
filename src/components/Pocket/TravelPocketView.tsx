@@ -73,7 +73,10 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
     .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 
   const handleAddItinerary = () => {
-    if (!newPlaceName.trim() || !currentTrip) return;
+    const isJapan = currentTrip?.country === 'JP';
+    const mapUrl = isJapan
+      ? `https://www.google.com/maps/search/${encodeURIComponent(newPlaceName.trim())}`
+      : `https://map.naver.com/v5/search/${encodeURIComponent(newPlaceName.trim())}`;
 
     const newItem: ItineraryItem = {
       id: `itin_${Date.now()}`,
@@ -82,7 +85,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
       placeName: newPlaceName.trim(),
       category: newPlaceCategory,
       memo: newPlaceMemo.trim(),
-      mapUrl: `https://map.naver.com/v5/search/${encodeURIComponent(newPlaceName.trim())}`,
+      mapUrl,
     };
 
     const updated: Trip = {
@@ -259,8 +262,13 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
     onUpdateTrip(updated);
   };
 
-  const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
-  const perPersonAmount = peopleCount > 0 ? Math.round(totalExpense / peopleCount) : 0;
+  const isJapan = currentTrip?.country === 'JP';
+  const currencySymbol = isJapan ? '¥' : '원';
+  const currencyPrefix = isJapan ? '¥' : '';
+  const currencySuffix = isJapan ? '엔' : '원';
+
+  const totalExpense = expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const perPersonAmount = peopleCount > 0 ? Math.round(totalExpense / peopleCount) : totalExpense;
 
   // 등록된 여행이 하나도 없는 경우 (안전한 방어 뷰)
   if (!currentTrip || trips.length === 0) {
@@ -982,7 +990,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
                 [{currentTrip.title}] 총 지출 합계
               </div>
               <div style={{ fontSize: '2rem', fontWeight: 900, marginTop: '2px' }}>
-                {totalExpense.toLocaleString()}원
+                {currencyPrefix}{totalExpense.toLocaleString()}{currencySuffix}
               </div>
             </div>
 
@@ -992,7 +1000,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
                 <span>총 <b>{peopleCount}명</b> 정산 시 1인당</span>
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8', marginTop: '2px' }}>
-                {perPersonAmount.toLocaleString()}원
+                {currencyPrefix}{perPersonAmount.toLocaleString()}{currencySuffix}
               </div>
             </div>
           </div>
@@ -1017,14 +1025,14 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
             <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '8px', marginBottom: '16px' }}>
               <input
                 type="text"
-                placeholder="지출 항목 (예: 렌트카, 맛집)"
+                placeholder={isJapan ? "지출 항목 (예: 신칸센, 돈키호테)" : "지출 항목 (예: 렌트카, 맛집)"}
                 value={newExpenseTitle}
                 onChange={e => setNewExpenseTitle(e.target.value)}
                 style={{ padding: '12px', borderRadius: '14px', border: '1px solid var(--border-subtle)', background: 'var(--bg-subtle)', color: 'var(--text-main)', outline: 'none' }}
               />
               <input
                 type="number"
-                placeholder="금액 (원)"
+                placeholder={`금액 (${currencySuffix})`}
                 value={newExpenseAmount}
                 onChange={e => setNewExpenseAmount(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addExpenseItem()}
@@ -1052,7 +1060,7 @@ export const TravelPocketView: React.FC<TravelPocketViewProps> = ({
                     <span style={{ fontSize: '0.74rem', background: '#e0e7ff', color: '#3182f6', padding: '2px 8px', borderRadius: '8px', fontWeight: 800 }}>
                       {item.category}
                     </span>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    <span style={{ fontSize: '0.94rem', fontWeight: 700, color: 'var(--text-main)' }}>
                       {item.title}
                     </span>
                   </div>
